@@ -1,27 +1,25 @@
-package com.develop.util;
+package com.develop.tools;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.Dimension;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.develop.sporthealth.R;
 /**
- * Created by Administrator on 2017/12/1.
+ * Created by Administrator on 2018/3/16.
+ * 自定义布局
  */
 
-public class ImgTxtLayout extends RelativeLayout{
+public class MyLayout extends RelativeLayout{
 
     /**
      * 左右结构，图片在左，文字在右
@@ -111,19 +109,19 @@ public class ImgTxtLayout extends RelativeLayout{
         isCost = false;
     }
 
-    public ImgTxtLayout(Context context) {
+    public MyLayout(Context context) {
         super(context);
         mContext=context;
         init(context,null,0);
     }
 
-    public ImgTxtLayout(Context context, AttributeSet attrs) {
+    public MyLayout(Context context, AttributeSet attrs) {
         super(context, attrs, 0);
         mContext=context;
         init(context,attrs,0);
     }
 
-    public ImgTxtLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public MyLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext=context;
         init(context, attrs, defStyleAttr);
@@ -131,16 +129,16 @@ public class ImgTxtLayout extends RelativeLayout{
 
     private void init(Context context, AttributeSet attrs, int defStyle) {
         //加载布局
-        LayoutInflater.from(context).inflate(R.layout.img_txt,this,true);
+        LayoutInflater.from(context).inflate(R.layout.mylayout,this,true);
         //初始化控件
         custom_txt= (TextView) findViewById(R.id.custom_txt);
         custom_img= (ImageView) findViewById(R.id.custom_img);
         setGravity(Gravity.CENTER);
         TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.ImgTxtLayout, defStyle, 0);
+                attrs, R.styleable.MyLayout, defStyle, 0);
         if (a != null) {
             //设置背景色
-            ColorStateList colorList = a.getColorStateList(R.styleable.ImgTxtLayout_backColor);
+            ColorStateList colorList = a.getColorStateList(R.styleable.MyLayout_backColor);
             if (colorList != null) {
                 backColor = colorList.getColorForState(getDrawableState(), 0);
                 if (backColor != 0) {
@@ -148,48 +146,48 @@ public class ImgTxtLayout extends RelativeLayout{
                 }
             }
             //记录View被按下时的背景色
-            ColorStateList colorListPress = a.getColorStateList(R.styleable.ImgTxtLayout_backColorPress);
+            ColorStateList colorListPress = a.getColorStateList(R.styleable.MyLayout_backColorPress);
             if (colorListPress != null) {
                 backColorPress = colorListPress.getColorForState(getDrawableState(), 0);
             }
             //设置icon
-            iconDrawable = a.getDrawable(R.styleable.ImgTxtLayout_iconDrawable);
+            iconDrawable = a.getDrawable(R.styleable.MyLayout_iconDrawable);
             if (iconDrawable != null) {
                 custom_img.setImageDrawable(iconDrawable);
             }
             //记录View被按下时的icon的图片
-            iconDrawablePress = a.getDrawable(R.styleable.ImgTxtLayout_iconDrawablePress);
+            iconDrawablePress = a.getDrawable(R.styleable.MyLayout_iconDrawablePress);
             //设置文字的颜色
-            textColor = a.getColorStateList(R.styleable.ImgTxtLayout_textColor);
+            textColor = a.getColorStateList(R.styleable.MyLayout_textColor);
             if (textColor != null) {
                 custom_txt.setTextColor(textColor);
             }
             //记录View被按下时文字的颜色
-            textColorPress = a.getColorStateList(R.styleable.ImgTxtLayout_textColorPress);
+            textColorPress = a.getColorStateList(R.styleable.MyLayout_textColorPress);
             //设置显示的文本内容
-            String text = a.getString(R.styleable.ImgTxtLayout_text);
+            String text = a.getString(R.styleable.MyLayout_text);
             if (text != null) {
                 //默认为隐藏的，设置文字后显示出来
                 custom_txt.setVisibility(VISIBLE);
                 custom_txt.setText(text);
             }
             //设置文本字体大小
-            float textSize = a.getFloat(R.styleable.ImgTxtLayout_textSize, 0);
+            float textSize = a.getFloat(R.styleable.MyLayout_textSize, 0);
             if (textSize != 0) {
                 custom_txt.setTextSize(textSize);
             }
             //设置两个控件的位置结构
-            float dp=a.getDimension(R.styleable.ImgTxtLayout_spacing,0);
+            float dp=a.getDimension(R.styleable.MyLayout_spacing,0);
             if(dp!=0)
             {
                 Float f1=new Float(dp);
                 spacing=f1.intValue();
             }
-            mStyle = a.getInt(R.styleable.ImgTxtLayout_style, 0);
+            mStyle = a.getInt(R.styleable.MyLayout_style, 0);
             setIconStyle(mStyle);
             //设置图片的宽、高
-            float width=a.getDimension(R.styleable.ImgTxtLayout_iconWidth,0);
-            float height=a.getDimension(R.styleable.ImgTxtLayout_iconHeight,0);
+            float width=a.getDimension(R.styleable.MyLayout_iconWidth,0);
+            float height=a.getDimension(R.styleable.MyLayout_iconHeight,0);
             if(width!=0 && height!=0)
             {
                 Float f1=new Float(width);
@@ -202,8 +200,8 @@ public class ImgTxtLayout extends RelativeLayout{
                 LayoutParams lp=new LayoutParams(iconWidth,iconHeight);
                 custom_img.setLayoutParams(lp);
             }
-            focusable=a.getBoolean(R.styleable.ImgTxtLayout_focusable,true);
-            clickable=a.getBoolean(R.styleable.ImgTxtLayout_clickable,true);
+            focusable=a.getBoolean(R.styleable.MyLayout_focusable,true);
+            clickable=a.getBoolean(R.styleable.MyLayout_clickable,true);
             a.recycle();
         }
 

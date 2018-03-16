@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    >
+
+    <RelativeLayout
+        android:id="@+id/me_ly_tx"
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+
+        <ImageView
+            android:id="@+id/me_img_tx"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@mipmap/ic_launcher"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:layout_toRightOf="@+id/me_img_tx"
+            android:paddingLeft="10dp"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:id="@+id/me_txt_tx"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                />
+            <TextView
+                android:id="@+id/me_txt_tx2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:paddingTop="6dp"
+                />
+
+        </LinearLayout>
+
+
+        <com.develop.tools.MyLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            app:iconDrawable="@mipmap/right"
+            app:spacing="4dp"
+            app:style="iconRight"
+            />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/me_ly_zh"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:id="@+id/me_txt_zh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="账号"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/me_myly_zh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            app:iconDrawable="@mipmap/right"
+            app:style="iconRight"
+            app:textSize="12"
+
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/me_ly_xm"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:id="@+id/me_txt_xm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="姓名"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/me_myly_xm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            app:iconDrawable="@mipmap/right"
+            app:style="iconRight"
+            app:textSize="12"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/me_ly_xb"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:id="@+id/me_txt_xb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="性别"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/me_myly_xb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            app:iconDrawable="@mipmap/right"
+            app:style="iconRight"
+            app:textSize="12"
+            
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/me_ly_yx"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:id="@+id/me_txt_yx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="邮箱"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/me_myly_yx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            app:iconDrawable="@mipmap/right"
+            app:style="iconRight"
+            app:textSize="12"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/me_ly_sj"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:id="@+id/me_txt_sj"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="手机"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/me_myly_sj"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            app:iconDrawable="@mipmap/right"
+            app:spacing="4dp"
+            app:style="iconRight"
+            app:textSize="12"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/me_ly_qq"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:id="@+id/me_txt_qq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="QQ"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/me_myly_qq"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            app:iconDrawable="@mipmap/right"
+            app:spacing="4dp"
+            app:style="iconRight"
+            app:textSize="12"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/me_ly_sz"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:id="@+id/me_txt_sz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="设置"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/me_myly_sz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            app:iconDrawable="@mipmap/right"
+            app:spacing="4dp"
+            app:style="iconRight"
+            />
+
+    </RelativeLayout>
+
+</LinearLayout>
