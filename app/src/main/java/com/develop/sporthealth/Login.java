@@ -63,6 +63,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
         login.setOnClickListener(this);
         cancel.setOnClickListener(this);
         register.setOnClickListener(this);
+
+        user.setText(sp.getUserName());
+        pwd.setText(sp.getPWD());
     }
 
     @Override
@@ -74,22 +77,20 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
                 data = op.select("select * from UserInfo where UserName=? and Password=?", new String[]{user.getText().toString(), pwd.getText().toString()});
                 if (data.size()!=0) {
                     map = data.get(0);
-                    if (map.get("UserName").toString().equals(user.getText().toString())) {
-                        //登录成功
-                        sp.setIsFirst(false);
-                        sp.setID(map.get("id"));
-                        sp.setUserName(map.get("UserName"));
-                        sp.setPWD(map.get("Password"));
-                        sp.setName(map.get("Name"));
-                        //设置登录标记
-                        sp.setIsLogin(true);
-                        //登录成功通知更新
-                        sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
-                        finish();
-                    } else {
-                        //登录失败
-                        Toast.makeText(context, "用户名或密码有误，请重新输入！", Toast.LENGTH_SHORT).show();
-                    }
+                    //登录成功
+                    sp.setIsFirst(false);
+                    sp.setID(map.get("id"));
+                    sp.setUserName(map.get("UserName"));
+                    sp.setPWD(map.get("Password"));
+                    sp.setName(map.get("Name"));
+                    //设置登录标记
+                    sp.setIsLogin(true);
+                    //登录成功通知更新
+                    sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
+                    finish();
+                }else {
+                    //登录失败
+                    Toast.makeText(context, "用户名或密码有误，请重新输入！", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.login_cancel:

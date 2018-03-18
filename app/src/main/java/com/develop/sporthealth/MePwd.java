@@ -79,7 +79,7 @@ public class MePwd extends AppCompatActivity implements TextWatcher{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.me_passwd);
 
-        context =getApplicationContext();
+        context =MePwd.this;
         sp=new SPTools(context);
         op=new SQLOperator(context);
 

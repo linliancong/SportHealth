@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
@@ -140,9 +141,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
                 }
             }.start();
         }
-        if(!sp.getIsLogin()){
-            tx_txt.setText("点我登录~");
-        }
+
         getUserInfo();
         return view;
     }
@@ -187,65 +186,88 @@ public class MeSy extends Fragment implements View.OnClickListener{
                     Intent intent = new Intent(Intent.ACTION_PICK);
                     intent.setType("image/*");
                     startActivityForResult(intent, REQUEST_CODE_PICK_IMAGE);
-                }else
-                {
+                }else {
                     Intent it_tx=new Intent(context,Login.class);
                     startActivity(it_tx);
                 }
                 break;
             case R.id.me_ly_zh:
-                Intent it_zh=new Intent();
-                it_zh.setClass(context,MeUpdate.class);
-                Bundle bd_zh=new Bundle();
-                bd_zh.putString("STR",map.get("UserName"));
-                bd_zh.putString("VALUE","UerName");
-                it_zh.putExtras(bd_zh);
-                startActivity(it_zh);
+                if(sp.getIsLogin()) {
+                    Intent it_zh = new Intent();
+                    it_zh.setClass(context, MeUpdate.class);
+                    Bundle bd_zh = new Bundle();
+                    bd_zh.putString("STR", map.get("UserName"));
+                    bd_zh.putString("VALUE", "UerName");
+                    it_zh.putExtras(bd_zh);
+                    startActivity(it_zh);
+                }else {
+                    Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.me_ly_xm:
-                Intent it_xm=new Intent();
-                it_xm.setClass(context,MeUpdate.class);
-                Bundle bd_xm=new Bundle();
-                bd_xm.putString("STR",map.get("Name"));
-                bd_xm.putString("VALUE","Name");
-                it_xm.putExtras(bd_xm);
-                startActivity(it_xm);
+                if(sp.getIsLogin()) {
+                    Intent it_xm = new Intent();
+                    it_xm.setClass(context, MeUpdate.class);
+                    Bundle bd_xm = new Bundle();
+                    bd_xm.putString("STR", map.get("Name"));
+                    bd_xm.putString("VALUE", "Name");
+                    it_xm.putExtras(bd_xm);
+                    startActivity(it_xm);
+                }else {
+                    Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.me_ly_xb:
-                Intent it_xb=new Intent();
-                it_xb.setClass(context,MeUpdate.class);
-                Bundle bd_xb=new Bundle();
-                bd_xb.putString("STR",map.get("Sex"));
-                bd_xb.putString("VALUE","Sex");
-                it_xb.putExtras(bd_xb);
-                startActivity(it_xb);
+                if(sp.getIsLogin()) {
+                    Intent it_xb = new Intent();
+                    it_xb.setClass(context, MeUpdate.class);
+                    Bundle bd_xb = new Bundle();
+                    bd_xb.putString("STR", map.get("Sex"));
+                    bd_xb.putString("VALUE", "Sex");
+                    it_xb.putExtras(bd_xb);
+                    startActivity(it_xb);
+                }else {
+                    Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.me_ly_yx:
-                Intent it_yx=new Intent();
-                it_yx.setClass(context,MeUpdate.class);
-                Bundle bd_yx=new Bundle();
-                bd_yx.putString("STR",map.get("Email"));
-                bd_yx.putString("VALUE","Email");
-                it_yx.putExtras(bd_yx);
-                startActivity(it_yx);
+                if(sp.getIsLogin()) {
+                    Intent it_yx = new Intent();
+                    it_yx.setClass(context, MeUpdate.class);
+                    Bundle bd_yx = new Bundle();
+                    bd_yx.putString("STR", map.get("Email"));
+                    bd_yx.putString("VALUE", "Email");
+                    it_yx.putExtras(bd_yx);
+                    startActivity(it_yx);
+                }else {
+                    Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.me_ly_sj:
-                Intent it_sj=new Intent();
-                it_sj.setClass(context,MeUpdate.class);
-                Bundle bd_sj=new Bundle();
-                bd_sj.putString("STR",map.get("Phone"));
-                bd_sj.putString("VALUE","Phone");
-                it_sj.putExtras(bd_sj);
-                startActivity(it_sj);
+                if(sp.getIsLogin()) {
+                    Intent it_sj = new Intent();
+                    it_sj.setClass(context, MeUpdate.class);
+                    Bundle bd_sj = new Bundle();
+                    bd_sj.putString("STR", map.get("Phone"));
+                    bd_sj.putString("VALUE", "Phone");
+                    it_sj.putExtras(bd_sj);
+                    startActivity(it_sj);
+                }else {
+                    Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.me_ly_qq:
-                Intent it_qq=new Intent();
-                it_qq.setClass(context,MeUpdate.class);
-                Bundle bd_qq=new Bundle();
-                bd_qq.putString("STR",map.get("QQ"));
-                bd_qq.putString("VALUE","QQ");
-                it_qq.putExtras(bd_qq);
-                startActivity(it_qq);
+                if(sp.getIsLogin()) {
+                    Intent it_qq = new Intent();
+                    it_qq.setClass(context, MeUpdate.class);
+                    Bundle bd_qq = new Bundle();
+                    bd_qq.putString("STR", map.get("QQ"));
+                    bd_qq.putString("VALUE", "QQ");
+                    it_qq.putExtras(bd_qq);
+                    startActivity(it_qq);
+                }else {
+                    Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.me_ly_sz:
                 Intent it_sz=new Intent(context,MeSetting.class);
@@ -280,19 +302,32 @@ public class MeSy extends Fragment implements View.OnClickListener{
      *获取用户信息
      * */
     public void getUserInfo(){
-        data = op.select("select * from UserInfo where id=?", new String[]{sp.getID()});
-        if (data.size()!=0) {
-            map = data.get(0);
-            tx_txt.setText(map.get("Name"));
-            tx2_txt.setText(map.get("UserName"));
-            zh_txt.setText(map.get("UserName"));
-            xm_txt.setText(map.get("Name"));
-            xb_txt.setText(map.get("Sex"));
-            yx_txt.setText(map.get("Email"));
-            sj_txt.setText(map.get("Phone"));
-            qq_txt.setText(map.get("QQ"));
+        if(!sp.getIsLogin()){
+            tx_txt.setText("点我登录~");
+            tx2_txt.setText("");
+            zh_txt.setText("");
+            xm_txt.setText("");
+            xb_txt.setText("");
+            yx_txt.setText("");
+            sj_txt.setText("");
+            qq_txt.setText("");
+            map=new HashMap<>();
+        }else {
+            data = op.select("select * from UserInfo where id=?", new String[]{sp.getID()});
+            if (data.size()!=0) {
+                map = data.get(0);
+                tx_txt.setText(map.get("Name"));
+                tx2_txt.setText(map.get("UserName"));
+                zh_txt.setText(map.get("UserName"));
+                xm_txt.setText(map.get("Name"));
+                xb_txt.setText(map.get("Sex"));
+                yx_txt.setText(map.get("Email"));
+                sj_txt.setText(map.get("Phone"));
+                qq_txt.setText(map.get("QQ"));
 
+            }
         }
+
     }
 
     /**
