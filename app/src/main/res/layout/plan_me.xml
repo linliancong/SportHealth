@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <RelativeLayout
+        android:id="@+id/planme_rl"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:background="@color/bg_white"
+        android:clickable="true"
+        android:focusable="true"
+        >
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/planme_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="15dp"
+            app:iconDrawable="@mipmap/back"
+            app:iconDrawablePress="@mipmap/back_select"
+            app:spacing="10dp"
+            app:style="iconLeft"
+            app:text="正在进行"
+            app:textSize="20"
+            app:textColor="@color/black"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2px"
+            android:background="@color/div_white"
+            android:layout_alignParentBottom="true"
+            />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/planme_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="#00000000"
+        android:cacheColorHint="#00000000"
+        android:listSelector="#00000000"
+        android:scrollbars="none"
+        android:background="@color/background"
+        android:visibility="visible"
+        android:layout_below="@+id/planme_rl"
+        />
+
+</RelativeLayout>

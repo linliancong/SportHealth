@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/number_rl"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:background="@color/bg_white"
+        android:clickable="true"
+        android:focusable="true"
+        >
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/number_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="15dp"
+            app:iconDrawable="@mipmap/back"
+            app:iconDrawablePress="@mipmap/back_select"
+            app:spacing="10dp"
+            app:style="iconLeft"
+            app:text="每周跑步次数"
+            app:textSize="20"
+            app:textColor="@color/black"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2px"
+            android:background="@color/div_white"
+            android:layout_alignParentBottom="true"
+            />
+    </RelativeLayout>
+
+    <RadioGroup
+        android:id="@+id/number_rg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/number_rl"
+        android:padding="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        >
+        <RadioButton
+            android:id="@+id/number_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="2 次"
+            android:button="@null"
+            android:drawableRight="@drawable/radio"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="10dp"
+            />
+        <RadioButton
+            android:id="@+id/number_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="3 次"
+            android:button="@null"
+            android:drawableRight="@drawable/radio"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="10dp"
+            />
+        <RadioButton
+            android:id="@+id/number_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="4 次"
+            android:button="@null"
+            android:drawableRight="@drawable/radio"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="10dp"
+            />
+        <RadioButton
+            android:id="@+id/number_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="5 次"
+            android:button="@null"
+            android:drawableRight="@drawable/radio"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="10dp"
+            />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/number_save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:alpha="1"
+        android:text="创建"
+        android:textColor="@color/carrot"
+        android:background="@drawable/button_plan"
+        android:layout_alignParentBottom="true"
+        />
+
+</RelativeLayout>

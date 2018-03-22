@@ -1,8 +1,11 @@
 package com.develop.tools.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.develop.bean.StepEntity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,6 +78,67 @@ public class SQLOperator {
             //结束事务
             db.endTransaction();
         }
+        db.close();
+    }
+
+
+    /**
+     * 以下三个方法均为保存步数的方法
+    * */
+
+    /**
+     * 添加一条新记录
+     *
+     * @param stepEntity
+     */
+    public void addNewData(StepEntity stepEntity) {
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("CurDate", stepEntity.getCurDate());
+        values.put("TotalSteps", stepEntity.getSteps());
+        db.insert("Step", null, values);
+
+        db.close();
+    }
+
+    /**
+     * 根据日期查询记录
+     *
+     * @param curDate
+     * @return
+     */
+    public StepEntity getCurDataByDate(String curDate) {
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+        StepEntity stepEntity = null;
+        Cursor cursor = db.query("Step", null, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            String date = cursor.getString(cursor.getColumnIndexOrThrow("CurDate"));
+            if (curDate.equals(date)) {
+                String steps = cursor.getString(cursor.getColumnIndexOrThrow("TotalSteps"));
+                stepEntity = new StepEntity(date, steps);
+                //跳出循环
+                break;
+            }
+        }
+        //关闭
+        db.close();
+        cursor.close();
+        return stepEntity;
+    }
+
+    /**
+     * 更新数据
+     * @param stepEntity
+     */
+    public void updateCurData(StepEntity stepEntity) {
+        SQLiteDatabase db = openHelper.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put("CurDate",stepEntity.getCurDate());
+        values.put("TotalSteps", stepEntity.getSteps());
+        db.update("Step", values, "CurDate=?", new String[]{stepEntity.getCurDate()});
+
         db.close();
     }
 

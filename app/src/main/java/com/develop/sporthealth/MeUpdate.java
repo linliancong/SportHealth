@@ -99,6 +99,9 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
             case "Sex":
                 person_imgtxt_update.setText("性别");
                 break;
+            case "Weight":
+                person_imgtxt_update.setText("体重");
+                break;
             case "UserName":
                 person_imgtxt_update.setText("账号");
                 break;

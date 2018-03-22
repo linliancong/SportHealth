@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <LinearLayout
+        android:id="@+id/bjxx_ly_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="vertical"
+        android:background="@drawable/plan_text"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="计划名称："
+                />
+            <TextView
+                android:id="@+id/plan_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="步行"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_marginLeft="10dp"
+                />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="计划详细："
+                />
+            <TextView
+                android:id="@+id/plan_item_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="每天行走10,000步"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_marginLeft="10dp"
+                />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="计划简介："
+                />
+            <TextView
+                android:id="@+id/plan_item_summary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="运动使我们快乐"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="10dp"
+
+                />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            >
+
+            <TextView
+                android:id="@+id/plan_item_txt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="开始时间："
+                />
+            <TextView
+                android:id="@+id/plan_item_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2018年3月21日"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_marginLeft="10dp"
+                />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

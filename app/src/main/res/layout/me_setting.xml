@@ -139,7 +139,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerInParent="true"
-            android:text="关于我们"
+            android:text="关于"
             android:textSize="16sp"
             android:textColor="@color/black"
             />

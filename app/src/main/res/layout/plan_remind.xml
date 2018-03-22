@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    >
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:background="@color/bg_white"
+        android:clickable="true"
+        android:focusable="true"
+        >
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/remind_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:paddingLeft="15dp"
+            app:iconDrawable="@mipmap/back"
+            app:iconDrawablePress="@mipmap/back_select"
+            app:spacing="10dp"
+            app:style="iconLeft"
+            app:text="消息提醒"
+            app:textSize="20"
+            app:textColor="@color/black"
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2px"
+            android:background="@color/div_white"
+            android:layout_alignParentBottom="true"
+            />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="步数提醒"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/carrot"
+        />
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="10dp"
+        >
+        <TextView
+            android:id="@+id/remind_walk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="今日步数【5000】步，还差【5000】步完成目标，继续加油哦！"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="跑步提醒"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/carrot"
+        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="10dp"
+        >
+        <TextView
+            android:id="@+id/remind_running"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="本周完成【5公里】跑步【1】次，还差【2】次，马上就要达到目标了，请继续坚持，生活总会把你想要的还给你的！"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+    </RelativeLayout>
+
+
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="相信美好的事总会发生!"
+        android:layout_marginTop="80dp"
+        android:textColor="@color/carrot"
+        android:gravity="center"
+        />
+
+
+</LinearLayout>

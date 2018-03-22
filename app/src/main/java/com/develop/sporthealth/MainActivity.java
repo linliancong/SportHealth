@@ -1,5 +1,6 @@
 package com.develop.sporthealth;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
@@ -9,9 +10,12 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.develop.bean.StepEntity;
 import com.develop.tools.AppManager;
 import com.develop.tools.CheckPermissionsTools;
 import com.develop.tools.FragmentAdapter;
+import com.develop.tools.SPTools;
+import com.develop.tools.database.SQLOperator;
 
 
 /**
@@ -42,6 +46,9 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
     private FragmentAdapter mAdapter=null;
 
     private long mTime=0;
+    private Context context;
+    private SPTools sp;
+    private SQLOperator op;
 
 
 
@@ -53,9 +60,30 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
         //页面管理
         AppManager.getAppManager().addActivity(MainActivity.this);
 
+        context=getApplicationContext();
+        sp=new SPTools(context);
+        op=new SQLOperator(context);
+
+        //这里初始化运动计划
+        if(sp.getIsFirst()){
+            op.insert("insert into SportInfo(Name,Summary) values(?,?)",new String[]{"步行","这是最简单的运动方式了，每天适量的运动就可以使我们保持健康。"});
+            op.insert("insert into SportInfo(Name,Summary) values(?,?)",new String[]{"5公里跑步","适当的跑跑步，增强自己的体魄，让自己可以更好的适应生活。"});
+            op.insert("insert into SportInfo(Name,Summary) values(?,?)",new String[]{"10公里跑步","跑步是一项长期的运动，老少皆宜，十公里说长不长，说短也不短。"});
+            op.insert("insert into SportInfo(Name,Summary) values(?,?)",new String[]{"半程马拉松","半程马拉松适合那些普通跑步已经不能满足需求的人，也适合那些想要参加马拉松的人，这只是入门。"});
+            op.insert("insert into SportInfo(Name,Summary) values(?,?)",new String[]{"马拉松","如果你可以坚持着跑下来，那么不就的将来你就是马拉松冠军的热门人选了，加油！"});
+            sp.setIsFirst(false);
+        }
+
         mAdapter=new FragmentAdapter(getSupportFragmentManager(),MainActivity.this);
         bindView();
         rb_home.setChecked(true);
+
+        //这里是测试数据
+        /*op.insert("insert into SportFinish(UserID,SportID,Time) values(?,?,?)",new String[]{sp.getID(),"1", TimeTools.getCurrentDate()});
+        op.insert("insert into SportFinish(UserID,SportID,Time) values(?,?,?)",new String[]{sp.getID(),"5", TimeTools.getCurrentDate()});
+        op.insert("insert into SportFinish(UserID,SportID,Time) values(?,?,?)",new String[]{sp.getID(),"5", "2018年3月19日"});*/
+        //op.insert("delete from SportFinish",new String[]{});
+
 
 
     }
@@ -190,6 +218,7 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
     protected void onResume() {
         super.onResume();
     }
+
 
 }
 

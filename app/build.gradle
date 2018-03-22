@@ -33,4 +33,6 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
     compile(name: 'MaterialEditText-2.0.3', ext: 'aar')
+    compile files('libs/hellocharts-library-1.5.8.jar')
+    compile files('libs/AMap3DMap_5.7.0_AMapNavi_5.5.0_20171229.jar')
 }

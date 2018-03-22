@@ -83,6 +83,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
                     sp.setUserName(map.get("UserName"));
                     sp.setPWD(map.get("Password"));
                     sp.setName(map.get("Name"));
+                    sp.setWeight(new Float(map.get("Weight")));
                     //设置登录标记
                     sp.setIsLogin(true);
                     //登录成功通知更新

@@ -1,0 +1,458 @@
+package com.develop.sporthealth;
+
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.AMapUtils;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.LocationSource;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.UiSettings;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.Text;
+import com.develop.tools.MyLayout;
+import com.develop.tools.SPTools;
+import com.develop.tools.database.SQLOperator;
+
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Administrator on 2018/1/8.
+ */
+
+public class HomeStartSport extends AppCompatActivity implements AMapLocationListener,LocationSource,View.OnClickListener{
+
+    private RelativeLayout title;
+    private MapView map;
+    private MyLayout back;
+    //一开始进去的布局
+    private RelativeLayout visible;
+    private Button start;
+    private MyLayout plan;
+    //操作按钮显示信息的布局
+    private RelativeLayout visible2;
+    private ImageView slide;
+    private LinearLayout ly1;
+    private TextView km;
+    private TextView time;
+    private TextView speed;
+    private TextView hot;
+    private LinearLayout ly2;
+    private TextView km2;
+    private TextView time2;
+    private LinearLayout ly3;
+    private Button play;
+    private Button pause;
+    private Button stop;
+    //是否详细界面
+    private boolean isShow=true;
+    //是否开始跑步
+    private boolean isStart=false;
+    //是否初始化完成
+    private boolean isFinish=false;
+
+    private double mTime=0;
+    private String SportID="";
+    private String RunID="";
+    SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private DecimalFormat db = new DecimalFormat("#.##");
+    private DecimalFormat db2 = new DecimalFormat("##");
+    private String startTime="";
+    private String endTime="";
+
+    private SPTools sp;
+    private SQLOperator op;
+    private Context context;
+
+    //声明AMapLocationClient对象
+    private AMapLocationClient mapClient;
+    //声明AMapLocationClientOption对象
+    private AMapLocationClientOption mapOption=null;
+    //声明地图控制器
+    private AMap aMap;
+    //声明定位蓝点
+    private MyLocationStyle style;
+    //监听对象
+    private OnLocationChangedListener mListener;
+    //是第一次运行标志
+    private boolean isFirst=true;
+    //
+    private LatLng latLng1=null;
+    private LatLng latLng2=null;
+    //当前速度
+    private double tspeed=0;
+    //总距离
+    private float distance=0;
+    //总时间
+    private int totalTime=0;
+    //总热量
+    private double totalHot=0;
+    //时、分、秒
+    private int HMS=0;
+    private int H=0;
+    private int M=0;
+    private int S=0;
+
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 0x001:
+                    km.setText(distance+"");
+                    km2.setText(distance+"");
+                    speed.setText(tspeed+"");
+                    hot.setText(totalHot+"");
+                    //时间转换
+                    S=totalTime%60;
+                    HMS=totalTime/60;
+                    M=HMS%60;
+                    H=HMS/60;
+                    time.setText(db2.format(H)+":"+db2.format(M)+":"+db2.format(S));
+                    time2.setText(db2.format(H)+":"+db2.format(M)+":"+db2.format(S));
+                    break;
+            }
+        }
+    };
+
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.home_startsport);
+
+        init(savedInstanceState);
+
+    }
+
+    private void init(@Nullable Bundle savedInstanceState) {
+        context=getApplicationContext();
+        sp=new SPTools(context);
+        op=new SQLOperator(context);
+        title=findViewById(R.id.start_ly_title);
+        back=findViewById(R.id.start_back);
+        //一开始进去的布局
+        visible=findViewById(R.id.start_visible);
+        start=findViewById(R.id.start_btn);
+        plan=findViewById(R.id.start_plan);
+        //操作按钮显示信息的布局
+        visible2=findViewById(R.id.start_visible2);
+        slide=findViewById(R.id.start_slide);
+        ly1=findViewById(R.id.start_ly1);
+        km=findViewById(R.id.start_km);
+        time=findViewById(R.id.start_time);
+        speed=findViewById(R.id.start_speed);
+        hot=findViewById(R.id.start_hot);
+        ly2=findViewById(R.id.start_ly2);
+        km2=findViewById(R.id.start_km2);
+        time2=findViewById(R.id.start_time2);
+        ly3=findViewById(R.id.start_ly3);
+        play=findViewById(R.id.start_play);
+        pause=findViewById(R.id.start_pause);
+        stop=findViewById(R.id.start_stop);
+
+        start.setOnClickListener(this);
+        slide.setOnClickListener(this);
+        play.setOnClickListener(this);
+        pause.setOnClickListener(this);
+        stop.setOnClickListener(this);
+
+        //获取地图控件引用
+        map=(MapView)findViewById(R.id.start_loction);
+        //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，实现地图生命周期管理
+        map.onCreate(savedInstanceState);
+
+        if(aMap==null){
+            aMap=map.getMap();
+            initMapStyle();
+            initLocation();
+        }
+
+
+        back.setOnClickListener(new MyLayout.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        plan.setOnClickListener(new MyLayout.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent();
+                startActivity(intent);
+            }
+        });
+    }
+
+
+    private void initLocation() {
+        //定位相关初始化
+        mapClient=new AMapLocationClient(this);
+        mapOption=new AMapLocationClientOption();
+        //设置定位监听
+        mapClient.setLocationListener(this);
+        //设置定位模式为高精度模式，Battert_Saving为低功耗模式，Device_Sensors是仅设备模式
+        mapOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+        //设置定位时间间隔
+        mapOption.setInterval(2000);
+        //设置单次定位
+            /*mapOption.setOnceLocation(true);
+            //获取最近3s内精度最高的一次定位结果：
+            //设置setOnceLocationLatest(boolean b)接口为true，启动定位时SDK会返回最近3s内精度最高的一次定位结果。
+            // 如果设置其为true，setOnceLocation(boolean b)接口也会被设置为true，反之不会，默认为false。
+            mapOption.setOnceLocationLatest(true);*/
+        //设置定位参数
+        mapClient.setLocationOption(mapOption);
+        //启动定位
+        mapClient.startLocation();
+
+    }
+
+    private void initMapStyle() {
+        //设置地图的类型
+        //aMap.setMapType(AMap.MAP_TYPE_NAVI);
+        //设置定位监听，要实现LoactionSource接口
+        aMap.setLocationSource(this);
+        // 连续定位、且将视角移动到地图中心点，定位点依照设备方向旋转，并且会跟随设备移动。（1秒1次定位）如果不设置myLocationType，默认也会执行此种模式。
+        style=new MyLocationStyle();
+        //LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER:连续定位、蓝点不会移动到地图中心点，并且蓝点会跟随设备移动。
+        //LOCATION_TYPE_FOLLOW_NO_CENTER:连续定位、蓝点不会移动到地图中心点，并且蓝点会跟随设备移动。
+        //LOCATION_TYPE_MAP_ROTATE_NO_CENTER:连续定位、蓝点不会移动到地图中心点，地图依照设备方向旋转，并且蓝点会跟随设备移动。
+        style.myLocationType(MyLocationStyle.LOCATION_TYPE_LOCATION_ROTATE_NO_CENTER);
+        //设置连续定位模式下的定位间隔，只在连续定位模式下生效，单次定位模式下不会生效
+        style.interval(1000);
+
+        //自定义定位蓝点
+        //图标
+        style.myLocationIcon(BitmapDescriptorFactory.fromResource(R.mipmap.navi_map_gps_locked));
+        //定位锚点
+        //style.anchor((float) 0.0,(float) 0.3);
+        //精度圈边框颜色
+        style.strokeColor(Color.parseColor("#331B85FF"));
+        //精度圈填充颜色
+        style.radiusFillColor(Color.parseColor("#111B85FF"));
+        //精度圈宽度
+        //style.strokeWidth(5);
+
+        //设置定位蓝点的Style
+        aMap.setMyLocationStyle(style);
+        //设置触发定位按钮是否显示，非必需设置。
+        aMap.getUiSettings().setMyLocationButtonEnabled(false);
+        //设置缩放按钮是否显示，非必需设置。
+        aMap.getUiSettings().setZoomControlsEnabled(false);
+        // 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
+        aMap.setMyLocationEnabled(true);
+        //显示定位层，并且可以触发定位，默认是false
+        //aMap.setMyLocationEnabled(true);
+        //设置地图的缩放级别
+        aMap.moveCamera(CameraUpdateFactory.zoomBy(6));
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        map.onDestroy();
+        if(mapClient!=null) {
+            mapClient.stopLocation();
+            mapClient.onDestroy();
+        }
+    }
+
+    @Override
+    public void onLocationChanged(AMapLocation aMapLocation) {
+        if(aMapLocation!=null && mListener!=null){
+            if(aMapLocation!=null && aMapLocation.getErrorCode()==0){
+                //定位成功回调信息，设置相关消息
+
+                //获取定位来源
+                aMapLocation.getLocationType();
+                //获取纬度
+                aMapLocation.getLatitude();
+                //获取经度
+                aMapLocation.getLongitude();
+                //获取精度信息
+                aMapLocation.getAccuracy();
+                //获取速度
+                tspeed=aMapLocation.getSpeed();
+                Date date=new Date(aMapLocation.getTime());
+                //定位的时间
+                df.format(date);
+
+                //判断是否在运动，如果是在运动则记录轨迹
+                if(isStart) {
+                    //计算距离
+                    latLng1=new LatLng(aMapLocation.getLatitude(),aMapLocation.getLongitude());
+                    if(latLng2==null){
+                        latLng2=latLng1;
+                    }else {
+                        distance += AMapUtils.calculateLineDistance(latLng1,latLng2)/1000;
+                        latLng2=latLng1;
+                    }
+                    totalTime+=1;
+                    //跑步热量（kcal）＝体重（kg）×距离（公里）×1.036
+                    totalHot=distance*1.036*sp.getWeight();
+                    op.insert("insert into SportLocation(UserID,RunID,Longitude,Latitude,Time,Speed) values(?,?,?,?,?,?)",
+                            new String[]{sp.getID(), RunID, aMapLocation.getLongitude() + "", aMapLocation.getLatitude() + "", df.format(date),aMapLocation.getSpeed()+""});
+
+                    handler.sendEmptyMessage(0x001);
+                }
+                //将地图移到定位点
+                aMap.moveCamera(CameraUpdateFactory.changeLatLng(new LatLng(aMapLocation.getLatitude(),aMapLocation.getLongitude())));
+
+            }
+            else{
+                //显示错误信息
+                Log.e("AmapError","location Error, ErrCode:"
+                        + aMapLocation.getErrorCode() + ", errInfo:"
+                        + aMapLocation.getErrorInfo());
+            }
+        }
+    }
+
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    @Override
+    public void activate(OnLocationChangedListener onLocationChangedListener) {
+        mListener=onLocationChangedListener;
+    }
+
+    @Override
+    public void deactivate() {
+        mListener=null;
+        if(mapClient!=null){
+            mapClient.stopLocation();
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.start_btn:
+                //点击开始跳转
+                initData();
+                if(isFinish) {
+                    visible.setVisibility(View.GONE);
+                    visible2.setVisibility(View.VISIBLE);
+                    title.setVisibility(View.GONE);
+                    isStart=true;
+                }
+                break;
+            case R.id.start_slide:
+                if(isShow) {
+                    isShow=!isShow;
+                    ly1.setVisibility(View.GONE);
+                    ly3.setVisibility(View.GONE);
+                    ly2.setVisibility(View.VISIBLE);
+                    slide.setImageResource(R.mipmap.slideup_pressed);
+                }else {
+                    isShow=!isShow;
+                    ly1.setVisibility(View.VISIBLE);
+                    ly3.setVisibility(View.VISIBLE);
+                    ly2.setVisibility(View.GONE);
+                    slide.setImageResource(R.mipmap.slidedown_pressed);
+                }
+                break;
+            case R.id.start_stop:
+                //退出
+                isStart=false;
+                if(System.currentTimeMillis()-mTime>2000)
+                {
+                    Toast.makeText(getApplicationContext(),"再按一次退出",Toast.LENGTH_SHORT).show();
+                    mTime=System.currentTimeMillis();
+                }
+                else {
+                    update();
+                    super.onBackPressed();
+                }
+                break;
+            case R.id.start_pause:
+                //暂停
+                isStart=false;
+                pause.setVisibility(View.GONE);
+                stop.setVisibility(View.VISIBLE);
+                play.setVisibility(View.VISIBLE);
+                break;
+            case R.id.start_play:
+                //继续
+                isStart=true;
+                latLng2=null;
+                pause.setVisibility(View.VISIBLE);
+                stop.setVisibility(View.GONE);
+                play.setVisibility(View.GONE);
+                break;
+        }
+    }
+
+    private void update() {
+        endTime=df.format(new Date());
+        String rspeed="";
+        List<Map<String, String>> data = new ArrayList<>();
+        data = op.select("select sum(Speed) speed,count(*) count from SportLocation where UserID=? and RunID=? ",
+                new String[]{sp.getID(),RunID});
+        if (data.size() != 0) {
+            double speed=new Double(data.get(0).get("speed"));
+            double count=new Double(data.get(0).get("count"));
+            rspeed=db.format(speed/count);
+
+        }
+        op.select("update SportRunning set EndTime=?,Speet=?,Total=?,Time=?,Hot=? where StartTime=?",
+                new String[]{endTime,rspeed,distance+"",totalTime+"",totalHot+"",startTime});
+    }
+
+    /**
+    * 初始化跑步数据
+    * */
+    private void initData() {
+        startTime=df.format(new Date());
+        List<Map<String, String>> data = new ArrayList<>();
+        data = op.select("select * from SportPlan where UserID=? and SportID<>1 and State=1", new String[]{sp.getID()});
+        if (data.size() != 0) {
+            SportID=data.get(0).get("SportID");
+            op.select("insert into SportRunning(UserID,SportID,StartTime) values(?,?,?)", new String[]{sp.getID(),SportID,startTime});
+            data = op.select("select * from SportRunning where UserID=? and SportID=? and StartTime=?", new String[]{sp.getID(),SportID,startTime});
+            if (data.size() != 0) {
+                isFinish=true;
+                RunID=data.get(0).get("id");
+            }else{
+                isFinish=false;
+                Toast.makeText(context,"初始化失败，请重试",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Toast.makeText(context,"请先暂停，然后再双击退出按钮",Toast.LENGTH_SHORT).show();
+    }
+}

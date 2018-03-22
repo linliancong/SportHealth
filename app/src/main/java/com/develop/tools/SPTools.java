@@ -57,6 +57,19 @@ public class SPTools {
         editor.commit();
     }
 
+
+    public float getWeight()
+    {
+        return sp.getFloat("Weight",0);
+    }
+
+    //用户密码
+    public void setWeight(float Weight){
+        editor.putFloat("Weight",Weight);
+        editor.commit();
+    }
+
+
     public String getPWD()
     {
         return sp.getString("PWD","");

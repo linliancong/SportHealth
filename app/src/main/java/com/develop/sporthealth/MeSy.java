@@ -59,6 +59,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
     private RelativeLayout zh;
     private RelativeLayout xm;
     private RelativeLayout xb;
+    private RelativeLayout tz;
     private RelativeLayout yx;
     private RelativeLayout sj;
     private RelativeLayout qq;
@@ -70,6 +71,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
     private MyLayout zh_txt;
     private MyLayout xm_txt;
     private MyLayout xb_txt;
+    private MyLayout tz_txt;
     private MyLayout yx_txt;
     private MyLayout sj_txt;
     private MyLayout qq_txt;
@@ -154,6 +156,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
         zh=view.findViewById(R.id.me_ly_zh);
         xm=view.findViewById(R.id.me_ly_xm);
         xb=view.findViewById(R.id.me_ly_xb);
+        tz=view.findViewById(R.id.me_ly_tz);
         yx=view.findViewById(R.id.me_ly_yx);
         sj=view.findViewById(R.id.me_ly_sj);
         qq=view.findViewById(R.id.me_ly_qq);
@@ -165,6 +168,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
         zh_txt=view.findViewById(R.id.me_myly_zh);
         xm_txt=view.findViewById(R.id.me_myly_xm);
         xb_txt=view.findViewById(R.id.me_myly_xb);
+        tz_txt=view.findViewById(R.id.me_myly_tz);
         yx_txt=view.findViewById(R.id.me_myly_yx);
         sj_txt=view.findViewById(R.id.me_myly_sj);
         qq_txt=view.findViewById(R.id.me_myly_qq);
@@ -172,6 +176,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
         tx.setOnClickListener(this);
         xm.setOnClickListener(this);
         xb.setOnClickListener(this);
+        tz.setOnClickListener(this);
         yx.setOnClickListener(this);
         sj.setOnClickListener(this);
         qq.setOnClickListener(this);
@@ -226,6 +231,19 @@ public class MeSy extends Fragment implements View.OnClickListener{
                     bd_xb.putString("VALUE", "Sex");
                     it_xb.putExtras(bd_xb);
                     startActivity(it_xb);
+                }else {
+                    Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.me_ly_tz:
+                if(sp.getIsLogin()) {
+                    Intent it_tz = new Intent();
+                    it_tz.setClass(context, MeUpdate.class);
+                    Bundle bd_tz = new Bundle();
+                    bd_tz.putString("STR", map.get("Weight"));
+                    bd_tz.putString("VALUE", "Weight");
+                    it_tz.putExtras(bd_tz);
+                    startActivity(it_tz);
                 }else {
                     Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();
                 }

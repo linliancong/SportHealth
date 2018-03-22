@@ -27,6 +27,7 @@ public class SQLOpenHelper extends SQLiteOpenHelper {
          * Email：邮箱
          * QQ：qq号
          * Image：头像
+         * Weight：体重
          * Remark：备注
         * */
         db.execSQL("create table if not exists UserInfo"+
@@ -39,6 +40,7 @@ public class SQLOpenHelper extends SQLiteOpenHelper {
                 "Email varchar(50),"+
                 "QQ varchar(50),"+
                 "Image varchar(50),"+
+                "Weight varchar(50),"+
                 "Remark varchar(50))");
 
         /**
@@ -62,6 +64,7 @@ public class SQLOpenHelper extends SQLiteOpenHelper {
          * UserID：用户编号
          * SportID：运动编号
          * State：计划状态（1、进行中，2、已完成）
+         * Target：计划目标
          * StartDate：计划创建时间
          * FinalDate：计划完成时间
          * Remark：备注
@@ -71,6 +74,7 @@ public class SQLOpenHelper extends SQLiteOpenHelper {
                 "UserID integer,"+
                 "SportID integer,"+
                 "State integer,"+
+                "Target integer,"+
                 "StartDate varchar(50),"+
                 "FinalDate varchar(50),"+
                 "Remark varchar(50))");
@@ -80,22 +84,65 @@ public class SQLOpenHelper extends SQLiteOpenHelper {
          * 以下为各个字段
          * id：id
          * UserID：用户编号
-         * SportID：运动编号
+         * RunID：统计编号
          * Longitude：经度
          * Latitude：纬度
-         * StartTime：运动开始时间
-         * FinalTime：运动完成时间
+         * Speed：配速
+         * Time：时间
          * Remark：备注
          * */
         db.execSQL("create table if not exists SportLocation"+
                 "(id integer primary key autoincrement,"+
                 "UserID integer,"+
-                "SportID integer,"+
+                "RunID integer,"+
                 "Longitude varchar(50),"+
                 "Latitude varchar(50),"+
-                "StartTime varchar(50),"+
-                "FinalTime varchar(50),"+
+                "Speed varchar(50),"+
+                "Time varchar(50),"+
                 "Remark varchar(50))");
+
+        /**
+         * 表名：SportRunning（跑步统计表）
+         * 以下为各个字段
+         * id：统计编号
+         * UserID：用户编号
+         * SportID：运动编号
+         * Total：运动公里数
+         * Time：运动时间
+         * Speed：配速
+         * Hot：热量
+         * StartTime：开始时间
+         * EndTime：结束时间
+         * Remark：备注
+         * */
+        db.execSQL("create table if not exists SportRunning"+
+                "(id integer primary key autoincrement,"+
+                "UserID integer,"+
+                "SportID integer,"+
+                "Total integer,"+
+                "Time integer,"+
+                "Speed integer,"+
+                "Hot integer,"+
+                "StartTime varchar(50),"+
+                "EndTime varchar(50),"+
+                "Remark varchar(50))");
+
+        /**
+         * 表名：SportFinish（运动完成情况表）
+         * 以下为各个字段
+         * id：id
+         * UserID：用户编号
+         * SportID：运动编号
+         * Time：时间
+         * Remark：备注
+         * */
+        db.execSQL("create table if not exists SportFinish"+
+                "(id integer primary key autoincrement,"+
+                "UserID integer,"+
+                "SportID integer,"+
+                "Time varchar(50),"+
+                "Remark varchar(50))");
+
 
         /**
          * 表名：Messages（消息表）
@@ -114,6 +161,18 @@ public class SQLOpenHelper extends SQLiteOpenHelper {
                 "Content varchar(100),"+
                 "Date varchar(50),"+
                 "State integer)");
+
+        /**
+         * 表名：Step（步数表）
+         * 以下为各个字段
+         * id：
+         * CurDate：时间
+         * TotalSteps：步数
+         * */
+        db.execSQL("create table Step (" +
+                "id integer primary key autoincrement, " +
+                "CurDate TEXT, " +
+                "TotalSteps TEXT)");
 
     }
 

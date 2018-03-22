@@ -1,6 +1,5 @@
 package com.develop.sporthealth;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -119,6 +118,8 @@ public class MeSetting extends AppCompatActivity implements View.OnClickListener
 
                 break;
             case R.id.setting_gy:
+                Intent intent=new Intent(context,MeGy.class);
+                startActivity(intent);
                 break;
         }
 

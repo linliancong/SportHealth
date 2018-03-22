@@ -28,7 +28,8 @@ public abstract class CheckPermissionsTools extends AppCompatActivity {
 	 * 需要进行检测的权限数组
 	 */
 	protected String[] needPermissions = {
-			//Manifest.permission.CAMERA
+			Manifest.permission.ACCESS_COARSE_LOCATION,
+			Manifest.permission.BODY_SENSORS
 			};
 	
 	private static final int PERMISSON_REQUESTCODE = 0;

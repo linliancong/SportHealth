@@ -181,7 +181,49 @@
             app:iconDrawable="@mipmap/right"
             app:style="iconRight"
             app:textSize="12"
-            
+
+            />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/black_line"
+            android:layout_alignParentBottom="true"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/me_ly_tz"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:id="@+id/me_txt_tz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="体重"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            />
+
+        <com.develop.tools.MyLayout
+            android:id="@+id/me_myly_tz"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            app:iconDrawable="@mipmap/right"
+            app:style="iconRight"
+            app:textSize="12"
+
             />
 
         <View
