@@ -326,6 +326,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
             zh_txt.setText("");
             xm_txt.setText("");
             xb_txt.setText("");
+            tz_txt.setText("");
             yx_txt.setText("");
             sj_txt.setText("");
             qq_txt.setText("");
@@ -339,6 +340,10 @@ public class MeSy extends Fragment implements View.OnClickListener{
                 zh_txt.setText(map.get("UserName"));
                 xm_txt.setText(map.get("Name"));
                 xb_txt.setText(map.get("Sex"));
+                tz_txt.setText(map.get("Weight"));
+                if(map.get("Weight")!=null) {
+                    sp.setWeight(new Float(map.get("Weight")));
+                }
                 yx_txt.setText(map.get("Email"));
                 sj_txt.setText(map.get("Phone"));
                 qq_txt.setText(map.get("QQ"));

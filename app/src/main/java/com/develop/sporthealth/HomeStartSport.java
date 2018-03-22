@@ -35,6 +35,7 @@ import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,7 +84,6 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
     private String RunID="";
     SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private DecimalFormat db = new DecimalFormat("#.##");
-    private DecimalFormat db2 = new DecimalFormat("##");
     private String startTime="";
     private String endTime="";
 
@@ -125,17 +125,18 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 0x001:
-                    km.setText(distance+"");
-                    km2.setText(distance+"");
-                    speed.setText(tspeed+"");
-                    hot.setText(totalHot+"");
+                    km.setText(db.format(distance));
+                    km2.setText(db.format(distance));
+                    speed.setText(db.format(tspeed));
+                    hot.setText(db.format(totalHot));
                     //时间转换
                     S=totalTime%60;
                     HMS=totalTime/60;
                     M=HMS%60;
                     H=HMS/60;
-                    time.setText(db2.format(H)+":"+db2.format(M)+":"+db2.format(S));
-                    time2.setText(db2.format(H)+":"+db2.format(M)+":"+db2.format(S));
+
+                    time.setText((H>10?(H+""):("0"+H))+":"+(M>10?(M+""):("0"+M))+":"+(S>10?(S+""):("0"+S)));
+                    time2.setText((H>10?(H+""):("0"+H))+":"+(M>10?(M+""):("0"+M))+":"+(S>10?(S+""):("0"+S)));
                     break;
             }
         }
@@ -221,7 +222,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
         //设置定位模式为高精度模式，Battert_Saving为低功耗模式，Device_Sensors是仅设备模式
         mapOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
         //设置定位时间间隔
-        mapOption.setInterval(2000);
+        mapOption.setInterval(1000);
         //设置单次定位
             /*mapOption.setOnceLocation(true);
             //获取最近3s内精度最高的一次定位结果：
@@ -264,13 +265,13 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
         //设置定位蓝点的Style
         aMap.setMyLocationStyle(style);
         //设置触发定位按钮是否显示，非必需设置。
-        aMap.getUiSettings().setMyLocationButtonEnabled(false);
+        //aMap.getUiSettings().setMyLocationButtonEnabled(false);
         //设置缩放按钮是否显示，非必需设置。
         aMap.getUiSettings().setZoomControlsEnabled(false);
         // 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
         aMap.setMyLocationEnabled(true);
         //显示定位层，并且可以触发定位，默认是false
-        //aMap.setMyLocationEnabled(true);
+        aMap.setMyLocationEnabled(true);
         //设置地图的缩放级别
         aMap.moveCamera(CameraUpdateFactory.zoomBy(6));
 
@@ -326,6 +327,8 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 }
                 //将地图移到定位点
                 aMap.moveCamera(CameraUpdateFactory.changeLatLng(new LatLng(aMapLocation.getLatitude(),aMapLocation.getLongitude())));
+                //刷新地图显示
+                mListener.onLocationChanged(aMapLocation);
 
             }
             else{
@@ -426,7 +429,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
             rspeed=db.format(speed/count);
 
         }
-        op.select("update SportRunning set EndTime=?,Speet=?,Total=?,Time=?,Hot=? where StartTime=?",
+        op.insert("update SportRunning set EndTime=?,Speet=?,Total=?,Time=?,Hot=? where StartTime=?",
                 new String[]{endTime,rspeed,distance+"",totalTime+"",totalHot+"",startTime});
     }
 
@@ -448,6 +451,8 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 isFinish=false;
                 Toast.makeText(context,"初始化失败，请重试",Toast.LENGTH_SHORT).show();
             }
+        }else {
+            Toast.makeText(context,"你还没有运动计划，请先创建计划",Toast.LENGTH_SHORT).show();
         }
     }
 

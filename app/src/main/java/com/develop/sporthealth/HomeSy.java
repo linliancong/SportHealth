@@ -121,7 +121,7 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
         if(datas.size()!=0) {
             target.setText(datas.get(0).get("Target"));
         }else {
-            target.setText("0");
+            target.setText("10000");
         }
         return view;
     }
