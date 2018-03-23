@@ -29,7 +29,11 @@ import com.amap.api.maps.MapView;
 import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.Polyline;
+import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.maps.model.Text;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
@@ -84,6 +88,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
     private String RunID="";
     SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private DecimalFormat db = new DecimalFormat("#.##");
+    private DecimalFormat db2 = new DecimalFormat("#");
     private String startTime="";
     private String endTime="";
 
@@ -101,15 +106,25 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
     private MyLocationStyle style;
     //监听对象
     private OnLocationChangedListener mListener;
+    //定义地图画线条
+    private Polyline polyline;
+    private PolylineOptions polylineOptions;
+    //定义地图点
+    private List<LatLng> latLngs;
+    //定义地图图层
+    private Marker marker;
+    private List<Marker> markers;
+    private MarkerOptions markerOptions;
+
     //是第一次运行标志
     private boolean isFirst=true;
     //
     private LatLng latLng1=null;
     private LatLng latLng2=null;
     //当前速度
-    private double tspeed=0;
+    private int tspeed=0;
     //总距离
-    private float distance=0;
+    private double distance=0.00;
     //总时间
     private int totalTime=0;
     //总热量
@@ -127,7 +142,6 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 case 0x001:
                     km.setText(db.format(distance));
                     km2.setText(db.format(distance));
-                    speed.setText(db.format(tspeed));
                     hot.setText(db.format(totalHot));
                     //时间转换
                     S=totalTime%60;
@@ -135,8 +149,16 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     M=HMS%60;
                     H=HMS/60;
 
-                    time.setText((H>10?(H+""):("0"+H))+":"+(M>10?(M+""):("0"+M))+":"+(S>10?(S+""):("0"+S)));
-                    time2.setText((H>10?(H+""):("0"+H))+":"+(M>10?(M+""):("0"+M))+":"+(S>10?(S+""):("0"+S)));
+                    time.setText((H>=10?(H+""):("0"+H))+":"+(M>=10?(M+""):("0"+M))+":"+(S>=10?(S+""):("0"+S)));
+                    time2.setText((H>=10?(H+""):("0"+H))+":"+(M>=10?(M+""):("0"+M))+":"+(S>=10?(S+""):("0"+S)));
+                    //配速转换
+                    S=tspeed%60;
+                    M=tspeed/60;
+                    if(tspeed!=0) {
+                        speed.setText(M + "'" + S + "''");
+                    }else {
+                        speed.setText("--");
+                    }
                     break;
             }
         }
@@ -206,7 +228,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
         plan.setOnClickListener(new MyLayout.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent();
+                Intent intent=new Intent(context,PlanRunning.class);
                 startActivity(intent);
             }
         });
@@ -223,6 +245,8 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
         mapOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
         //设置定位时间间隔
         mapOption.setInterval(1000);
+        //设置高精度模式下获取GPS速度
+        mapOption.setSensorEnable(true);
         //设置单次定位
             /*mapOption.setOnceLocation(true);
             //获取最近3s内精度最高的一次定位结果：
@@ -301,8 +325,6 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 aMapLocation.getLongitude();
                 //获取精度信息
                 aMapLocation.getAccuracy();
-                //获取速度
-                tspeed=aMapLocation.getSpeed();
                 Date date=new Date(aMapLocation.getTime());
                 //定位的时间
                 df.format(date);
@@ -312,18 +334,63 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     //计算距离
                     latLng1=new LatLng(aMapLocation.getLatitude(),aMapLocation.getLongitude());
                     if(latLng2==null){
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.sport_ending));
                         latLng2=latLng1;
                     }else {
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.mipmap.sport_start_running));
+                        //获取距离,AMapUtils.calculateLineDistance(latLng1,latLng2)返回 m
                         distance += AMapUtils.calculateLineDistance(latLng1,latLng2)/1000;
+                        //获取配速(多少分钟跑一公里),aMapLocation.getSpeed()返回 m/s
+                        //人一般步行的速度是1m/s，所以1m/s以下的相当于静止，不计算
+                        if(aMapLocation.getSpeed()>1) {
+                            tspeed = (int) (1000 / aMapLocation.getSpeed());
+                        }else {
+                            tspeed=0;
+                        }
                         latLng2=latLng1;
                     }
+
+                    //显示轨迹、标记
+                    //设置数据源
+                    polylineOptions.add(latLng1);
+                    //polylineOptions.addAll(latLngs);
+                    //设置线条宽度
+                    polylineOptions.width(10);
+                    //设置线条颜色
+                    polylineOptions.color(Color.parseColor("#e67e22"));
+                    //将线条加到地图上
+                    polyline=aMap.addPolyline(polylineOptions);
+
+                    //设置点
+                    markerOptions.position(latLng1);
+                    //设置图片
+
+                    //将Maeker设置为贴地显示，可以双指下拉地图查看效果
+                    markerOptions.setFlat(true);
+                    //添加标记
+                    marker=aMap.addMarker(markerOptions);
+                    markers.add(marker);
+                    //设置标记点显示
+                    for (int i=0;i<markers.size();i++){
+                        Marker mk=markers.get(i);
+                        mk.setVisible(false);
+                        if(i==0){
+                            mk.setVisible(true);
+                        }
+                        if(i==markers.size()-1){
+                            mk.setVisible(true);
+                        }
+
+                    }
+
                     totalTime+=1;
                     //跑步热量（kcal）＝体重（kg）×距离（公里）×1.036
                     totalHot=distance*1.036*sp.getWeight();
                     op.insert("insert into SportLocation(UserID,RunID,Longitude,Latitude,Time,Speed) values(?,?,?,?,?,?)",
-                            new String[]{sp.getID(), RunID, aMapLocation.getLongitude() + "", aMapLocation.getLatitude() + "", df.format(date),aMapLocation.getSpeed()+""});
+                            new String[]{sp.getID(), RunID, aMapLocation.getLongitude() + "", aMapLocation.getLatitude() + "", df.format(date), tspeed + ""});
 
                     handler.sendEmptyMessage(0x001);
+
                 }
                 //将地图移到定位点
                 aMap.moveCamera(CameraUpdateFactory.changeLatLng(new LatLng(aMapLocation.getLatitude(),aMapLocation.getLongitude())));
@@ -369,6 +436,11 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     visible2.setVisibility(View.VISIBLE);
                     title.setVisibility(View.GONE);
                     isStart=true;
+                    isFirst=false;
+                    //开始运动时地图轨迹、标记初始化
+                    polylineOptions=new PolylineOptions();
+                    markerOptions=new MarkerOptions();
+                    markers=new ArrayList<>();
                 }
                 break;
             case R.id.start_slide:
@@ -402,6 +474,8 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
             case R.id.start_pause:
                 //暂停
                 isStart=false;
+                tspeed=0;
+                handler.sendEmptyMessage(0x001);
                 pause.setVisibility(View.GONE);
                 stop.setVisibility(View.VISIBLE);
                 play.setVisibility(View.VISIBLE);
@@ -418,19 +492,28 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
     }
 
     private void update() {
-        endTime=df.format(new Date());
-        String rspeed="";
-        List<Map<String, String>> data = new ArrayList<>();
-        data = op.select("select sum(Speed) speed,count(*) count from SportLocation where UserID=? and RunID=? ",
-                new String[]{sp.getID(),RunID});
-        if (data.size() != 0) {
-            double speed=new Double(data.get(0).get("speed"));
-            double count=new Double(data.get(0).get("count"));
-            rspeed=db.format(speed/count);
+        //如果运动超过三分钟则更新运动表，否则删除该记录，并且删除轨迹记录。
+        if (totalTime > 180) {
+            endTime = df.format(new Date());
+            String rspeed = "0";
+            List<Map<String, String>> data = new ArrayList<>();
+            data = op.select("select sum(Speed) speed,count(*) count from SportLocation where UserID=? and RunID=? ",
+                    new String[]{sp.getID(), RunID});
+            if (data.size() != 0) {
+                if (data.get(0).get("speed") != null && data.get(0).get("count") != null) {
+                    double speed = new Double(data.get(0).get("speed"));
+                    double count = new Double(data.get(0).get("count"));
+                    rspeed = db2.format(speed / count);
+                }
 
+
+            }
+            op.insert("update SportRunning set EndTime=?,Speed=?,Total=?,Time=?,Hot=? where StartTime=?",
+                    new String[]{endTime, rspeed, distance + "", totalTime + "", totalHot + "", startTime});
+        }else{
+            op.insert("delete from SportRunning where id=?",new String[]{RunID});
+            op.insert("delete from SportLocation where RunID=?",new String[]{RunID});
         }
-        op.insert("update SportRunning set EndTime=?,Speet=?,Total=?,Time=?,Hot=? where StartTime=?",
-                new String[]{endTime,rspeed,distance+"",totalTime+"",totalHot+"",startTime});
     }
 
     /**
@@ -458,6 +541,10 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
 
     @Override
     public void onBackPressed() {
-        Toast.makeText(context,"请先暂停，然后再双击退出按钮",Toast.LENGTH_SHORT).show();
+        if(isFirst){
+            super.onBackPressed();
+        }else {
+            Toast.makeText(context, "请先暂停，然后再双击退出按钮", Toast.LENGTH_SHORT).show();
+        }
     }
 }

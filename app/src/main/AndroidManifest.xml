@@ -11,15 +11,17 @@
         android:theme="@style/NoAction">
 
         <!--高德地图配置(发布版本+调试版本)-->
-        <!--<meta-data
-            android:name="com.amap.api.v2.apikey"
-            android:value="38235debd0fd656778de6542ae3b6b53"
-            />-->
-
-        <!--高德地图配置(调试版本2)-->
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="91641b1db69aca36b9dd4fddba93ebb9"/>
+            android:value="38235debd0fd656778de6542ae3b6b53"
+            />
+
+        <!--高德地图配置(调试版本2)-->
+        <!--<meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="91641b1db69aca36b9dd4fddba93ebb9"/>-->
+
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -108,6 +110,27 @@
         <activity android:name=".HomeStartSport">
             <intent-filter>
                 <action android:name="android.intent.action.HOMESTARTSPORT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".HomeStep">
+            <intent-filter>
+                <action android:name="android.intent.action.HOMESTEEP" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".HomeRunning">
+            <intent-filter>
+                <action android:name="android.intent.action.HOMERUNNING" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".HomeRunningShow">
+            <intent-filter>
+                <action android:name="android.intent.action.HOMERUNNINGSHOW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

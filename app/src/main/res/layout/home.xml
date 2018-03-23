@@ -60,7 +60,7 @@
                     android:id="@+id/home_reality"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2356"
+                    android:text="0"
                     android:textSize="26sp"
                     android:textStyle="bold"
                     android:textColor="@color/turquoise"
@@ -120,7 +120,7 @@
                         android:id="@+id/home_heat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="87"
+                        android:text="0"
                         android:textStyle="bold"
                         android:textSize="20sp"
                         android:textColor="@color/black"
@@ -147,7 +147,7 @@
                         android:id="@+id/home_sport1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2.09"
+                        android:text="0.00"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/black"
@@ -205,7 +205,7 @@
                     android:id="@+id/home_sport2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2.09"
+                    android:text="0.00"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
@@ -240,7 +240,7 @@
                     android:id="@+id/home_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="5"
+                    android:text="0"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@color/black"
@@ -265,22 +265,23 @@
                 android:layout_below="@+id/home_view"
                 android:layout_marginTop="10dp"
                 />
-            <Button
-                android:id="@+id/home_start"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/home_column"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:alpha="1"
-                android:text="开始运动"
-                android:textSize="18sp"
-                android:textColor="@color/bg_white"
-                android:background="@drawable/button"
-                />
 
         </RelativeLayout>
+
+        <Button
+            android:id="@+id/home_start"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/home_rl2"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:alpha="1"
+            android:text="开始运动"
+            android:textSize="18sp"
+            android:textColor="@color/bg_white"
+            android:background="@drawable/button"
+            />
 
     </RelativeLayout>
 </ScrollView>

@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.develop.bean.StepEntity;
@@ -27,6 +28,8 @@ import com.develop.tools.TimeTools;
 import com.develop.tools.database.SQLOperator;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +67,9 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
     private TextView count;
     private Button start;
 
+    private RelativeLayout step_rl;
+    private RelativeLayout chart_rl;
+
     //柱形图相关设置
     private ColumnChartView column;
     private List<String> data=new ArrayList<>();
@@ -84,6 +90,8 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
     private String curSelDate;
     private DecimalFormat df = new DecimalFormat("#.##");
     private DecimalFormat df2 = new DecimalFormat("#");
+    SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    SimpleDateFormat sdf2=new SimpleDateFormat("MM-dd");
 
 
     public HomeSy(){}
@@ -101,11 +109,6 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
 
             init();
 
-
-
-            getAxisXLables();
-            initLineChart();
-
             /**
              * 这里判断当前设备是否支持计步
              */
@@ -116,13 +119,16 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
             }
 
         }
-        List<Map<String, String>> datas = new ArrayList<>();
-        datas = op.select("select *  from SportPlan where UserID=? and SportID=1 and State=1", new String[]{sp.getID()});
-        if(datas.size()!=0) {
-            target.setText(datas.get(0).get("Target"));
-        }else {
-            target.setText("10000");
+
+        try {
+            getChartDate();
+            getAxisXLables();
+            initLineChart();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
+
+
         return view;
     }
 
@@ -139,38 +145,17 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
         count=view.findViewById(R.id.home_count);
         column=view.findViewById(R.id.home_column);
         start=view.findViewById(R.id.home_start);
+        step_rl=view.findViewById(R.id.home_rl1);
+        chart_rl=view.findViewById(R.id.home_rl2);
 
         start.setOnClickListener(this);
+        step_rl.setOnClickListener(this);
+        chart_rl.setOnClickListener(this);
 
         curSelDate = TimeTools.getCurrentDate();
-
-
-
-        //以下数据为测试数据
-        //X轴的标注
-        data.add("3-1");
-        data.add("3-15");
-        data.add("4-16");
-        data.add("5-21");
-        data.add("6-17");
-        data.add("7-28");
-        data.add("8-31");
-        data.add("9-17");
-        data.add("10-28");
-        data.add("11-31");
-
-        //图表的数据点
-        score.add("3.5");
-        score.add("1.7");
-        score.add("6.5");
-        score.add("14.3");
-        score.add("2.1");
-        score.add("5.3");
-        score.add("17.1");
-        score.add("2.1");
-        score.add("5.3");
-        score.add("17.1");
     }
+
+
 
     /**
      *设置X轴的显示
@@ -271,6 +256,16 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
             case R.id.home_start:
                 Intent intent=new Intent(context,HomeStartSport.class);
                 startActivity(intent);
+                break;
+            case R.id.home_rl1:
+                //步行分析
+                /*Intent intent2=new Intent(context,HomeStep.class);
+                startActivity(intent2);*/
+                break;
+            case R.id.home_rl2:
+                //跑步分析
+                Intent intent3=new Intent(context,HomeRunning.class);
+                startActivity(intent3);
                 break;
         }
     }
@@ -476,5 +471,73 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    /**
+     * 设置图标的数据
+    * */
+    private void getChartDate() throws ParseException {
+        //显示目标数据
+        List<Map<String, String>> datas = new ArrayList<>();
+        datas = op.select("select *  from SportPlan where UserID=? and SportID=1 and State=1", new String[]{sp.getID()});
+        if(datas.size()!=0) {
+            target.setText(datas.get(0).get("Target"));
+        }else {
+            target.setText("10000");
+        }
+        //显示统计数据
+        //这里先删除无效数据，避免出现异常
+        op.insert("delete from SportRunning where UserID=? and Total is null",new String[]{sp.getID()});
+        List<Map<String, String>> maps = new ArrayList<>();
+        maps = op.select("select * from SportRunning where UserID=? order by StartTime", new String[]{sp.getID()});
+        if (maps.size() != 0) {
+            String date1="";
+            String date2="";
+            int i=0;
+            double total=0;
+            for (;i<maps.size();i++) {
+                //把日期先转为标准格式，再进行我们需要的变化
+                date1=sdf2.format(sdf.parse(maps.get(i).get("StartTime")));
+                if(!date1.equals(date2)){
+                    data.add(date1);
+                    score.add(maps.get(i).get("Total"));
+                }else {
+                    double n=new Double(score.get(score.size()-1));
+                    double m=new Double(maps.get(i).get("Total"));
+                    score.remove(score.size()-1);
+                    score.add(df.format(n+m));
+                }
+                total+=new Double(maps.get(i).get("Total"));
+                date2=date1;
+
+            }
+            sport2.setText(df.format(total));
+            count.setText(i+"");
+        }
+
+        //以下数据为测试数据
+        //X轴的标注
+       /* data.add("3-1");
+        data.add("3-15");
+        data.add("4-16");
+        data.add("5-21");
+        data.add("6-17");
+        data.add("7-28");
+        data.add("8-31");
+        data.add("9-17");
+        data.add("10-28");
+        data.add("11-31");*/
+
+        //图表的数据点
+       /* score.add("3.5");
+        score.add("1.7");
+        score.add("6.5");
+        score.add("14.3");
+        score.add("2.1");
+        score.add("5.3");
+        score.add("17.1");
+        score.add("2.1");
+        score.add("5.3");
+        score.add("17.1");*/
     }
 }
