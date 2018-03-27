@@ -14,6 +14,7 @@ import java.util.List;
 
 public class TimeTools {
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日");
+    private static SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     private static Calendar mCalendar = Calendar.getInstance();
     private static String[] weekStrings = new String[]{"日","一", "二", "三", "四", "五", "六"};
     private static String[] rWeekStrings = new String[]{"周日","周一", "周二", "周三", "周四", "周五", "周六"};
@@ -52,6 +53,7 @@ public class TimeTools {
      * @return
      */
     public static String getWeekStr(String dateStr){
+        mCalendar = Calendar.getInstance();
 
         String todayStr = dateFormat.format(mCalendar.getTime());
 
@@ -98,7 +100,19 @@ public class TimeTools {
      * @return yyyy年MM月dd日
      */
     public static String getCurrentDate() {
+        mCalendar = Calendar.getInstance();
         String currentDateStr = dateFormat.format(mCalendar.getTime());
+        return currentDateStr;
+    }
+
+    /**
+     * 获取当前的日期
+     *
+     * @return yyyy/MM/dd/ HH:mm:ss
+     */
+    public static String getCurrentDate2() {
+        mCalendar = Calendar.getInstance();
+        String currentDateStr = dateFormat2.format(mCalendar.getTime());
         return currentDateStr;
     }
 

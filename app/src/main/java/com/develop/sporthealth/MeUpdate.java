@@ -1,6 +1,7 @@
 package com.develop.sporthealth;
 
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,9 +30,9 @@ import java.util.Map;
 
 public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnClickListener {
 
-    private MyLayout person_imgtxt_update;
-    private Button person_btn_update;
-    private EditText person_txt_update;
+    private MyLayout update;
+    private Button save;
+    private EditText input;
 
     private String content;
     private String value;
@@ -47,7 +48,7 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
             switch (msg.what){
                 case 0x001:
                     Toast.makeText(context,"修改成功",Toast.LENGTH_SHORT).show();
-                    sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
+                    sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.MeSy$MyBroad")));
                     break;
                 case 0x002:
                     Toast.makeText(context,"修改失败",Toast.LENGTH_SHORT).show();
@@ -72,20 +73,20 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
         context=MeUpdate.this;
         sp=new SPTools(context);
         op=new SQLOperator(context);
-        person_imgtxt_update = findViewById(R.id.person_imgtxt_update);
-        person_btn_update = findViewById(R.id.person_btn_update);
-        person_txt_update = findViewById(R.id.person_txt_update);
+        update = findViewById(R.id.me_myly_update);
+        save = findViewById(R.id.me_btn_update);
+        input = findViewById(R.id.me_txt_update);
 
         it = getIntent();
         Bundle bd = it.getExtras();
         content = bd.getString("STR","");
         value = bd.getString("VALUE","");
-        person_txt_update.setText(content);
-        person_txt_update.setSelection(content.length());
+        input.setText(content);
+        input.setSelection(content.length());
 
-        person_txt_update.addTextChangedListener(this);
-        person_btn_update.setOnClickListener(this);
-        person_imgtxt_update.setOnClickListener(new MyLayout.OnClickListener() {
+        input.addTextChangedListener(this);
+        save.setOnClickListener(this);
+        update.setOnClickListener(new MyLayout.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
@@ -94,25 +95,25 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
 
         switch (value) {
             case "Name":
-                person_imgtxt_update.setText("姓名");
+                update.setText("姓名");
                 break;
             case "Sex":
-                person_imgtxt_update.setText("性别");
+                update.setText("性别");
                 break;
             case "Weight":
-                person_imgtxt_update.setText("体重");
+                update.setText("体重");
                 break;
             case "UserName":
-                person_imgtxt_update.setText("账号");
+                update.setText("账号");
                 break;
             case "Email":
-                person_imgtxt_update.setText("邮箱");
+                update.setText("邮箱");
                 break;
             case "Phone":
-                person_imgtxt_update.setText("手机");
+                update.setText("手机");
                 break;
             case "QQ":
-                person_imgtxt_update.setText("QQ");
+                update.setText("QQ");
                 break;
             default:
                 break;
@@ -129,9 +130,9 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
     private void update(String sql) {
         List<Map<String, String>> data = new ArrayList<>();
         Map<String, String> map = new HashMap<>();
-        op.insert("update UserInfo set "+sql+"=? where id=?", new String[]{person_txt_update.getText().toString(),sp.getID()});
+        op.insert("update UserInfo set "+sql+"=? where id=?", new String[]{input.getText().toString(),sp.getID()});
         //判断是否修改成功
-        data = op.select("select count(1) num from UserInfo where "+sql+"=? and id=?", new String[]{person_txt_update.getText().toString(),sp.getID()});
+        data = op.select("select count(1) num from UserInfo where "+sql+"=? and id=?", new String[]{input.getText().toString(),sp.getID()});
         if (data.size() != 0) {
             map = data.get(0);
             if (map.get("num").toString().equals("1")) {
@@ -144,7 +145,7 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        person_btn_update.setEnabled(false);
+        save.setEnabled(false);
 
     }
 
@@ -155,8 +156,8 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
 
     @Override
     public void afterTextChanged(Editable s) {
-        if (person_txt_update.getText().toString().length() != 0) {
-            person_btn_update.setEnabled(true);
+        if (input.getText().toString().length() != 0) {
+            save.setEnabled(true);
         }
 
     }

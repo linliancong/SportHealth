@@ -64,8 +64,11 @@ public class HomeRunning extends AppCompatActivity {
 
     private void getData() {
         int speed=0;
+        int time=0;
         int S=0;
         int M=0;
+        int H=0;
+        int HMS=0;
         List<Map<String, String>> data = new ArrayList<>();
         data = op.select("select * from SportRunning where UserID=? order by StartTime desc", new String[]{sp.getID()});
         if (data.size() != 0) {
@@ -74,7 +77,6 @@ public class HomeRunning extends AppCompatActivity {
                 running.setRunID(data.get(i).get("id"));
                 running.setStartTime(data.get(i).get("StartTime"));
                 running.setEndTime(data.get(i).get("EndTime"));
-                running.setTime(data.get(i).get("Time"));
                 running.setHot(data.get(i).get("Hot"));
                 running.setTotal(data.get(i).get("Total"));
                 if(data.get(i).get("Speed")!=null){
@@ -85,7 +87,15 @@ public class HomeRunning extends AppCompatActivity {
                 }else{
                     running.setSpeed("--");
                 }
+                time=new Integer(data.get(i).get("Time"));
+                S=time%60;
+                HMS=time/60;
+                M=HMS%60;
+                H=HMS/60;
+                running.setTime((H>=10?(H+""):("0"+H))+":"+(M>=10?(M+""):("0"+M))+":"+(S>=10?(S+""):("0"+S)));
                 runnings.add(running);
+
+
             }
 
         }

@@ -1,13 +1,17 @@
 package com.develop.sporthealth;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.os.Message;
+import android.service.voice.VoiceInteractionService;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -66,6 +70,8 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
     private TextView sport2;
     private TextView count;
     private Button start;
+    private TextView lose;
+    private ImageView loseimg;
 
     private RelativeLayout step_rl;
     private RelativeLayout chart_rl;
@@ -93,6 +99,27 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
     SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     SimpleDateFormat sdf2=new SimpleDateFormat("MM-dd");
 
+    //广播通知主线程更新
+    private static boolean state=false;
+    private MeSy.MyBroad broad;
+
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case 0x001:
+                    try {
+                        getChartDate();
+                        getAxisXLables();
+                        initLineChart();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
+    };
+
 
     public HomeSy(){}
     @SuppressLint("ValidFragment")
@@ -109,6 +136,25 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
 
             init();
 
+            //广播更新
+            broad=new MeSy.MyBroad();
+            IntentFilter filter=new IntentFilter();
+            filter.addAction("com.develop.sport.MYBROAD3");
+            getActivity().registerReceiver(broad,filter);
+
+            new Thread(){
+                @Override
+                public void run() {
+                    while (true)
+                    {
+                        if(state) {
+                            state=false;
+                            handler.sendEmptyMessage(0x001);
+                        }
+                    }
+                }
+            }.start();
+
             /**
              * 这里判断当前设备是否支持计步
              */
@@ -117,15 +163,14 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
                 setDatas();
                 setupService();
             }
+            try {
+                getChartDate();
+                getAxisXLables();
+                initLineChart();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
-        }
-
-        try {
-            getChartDate();
-            getAxisXLables();
-            initLineChart();
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
 
 
@@ -147,6 +192,8 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
         start=view.findViewById(R.id.home_start);
         step_rl=view.findViewById(R.id.home_rl1);
         chart_rl=view.findViewById(R.id.home_rl2);
+        lose=view.findViewById(R.id.home_lose);
+        loseimg=view.findViewById(R.id.home_loseimg);
 
         start.setOnClickListener(this);
         step_rl.setOnClickListener(this);
@@ -272,16 +319,6 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
 
 
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        mSensorManager.unregisterListener(this, mStepDetector);
-
-        mSensorManager.unregisterListener(this, mStepCount);
-
-    }
-
     /**
      * 开启计步服务
      */
@@ -306,6 +343,8 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
             sport1.setText(countTotalKM(steps));
             //计算卡路里
             heat.setText(countTotalHeat(steps));
+            //量化计算
+            showQuantity(steps);
             //显示进度
             showImagth(steps);
         } else {
@@ -315,6 +354,8 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
             sport1.setText("0");
             //计算卡路里
             heat.setText("0");
+            //量化计算
+            showQuantity(0);
             //显示进度
             showImagth(0);
         }
@@ -422,6 +463,36 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
             }
             progress.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.mipmap.progress_29));
         }
+    }
+
+    /**
+    * 简易的量化计算
+     */
+    public void showQuantity(int step){
+        int hot=new Integer(countTotalHeat(step));
+        int count=0;
+        if (hot/144==1){
+            loseimg.setImageResource(R.mipmap.step_egg);
+        }
+        if(hot/147==1){
+            loseimg.setImageResource(R.mipmap.step_icecream);
+        }
+        if(hot/181==1){
+            loseimg.setImageResource(R.mipmap.step_drumsticks);
+        }
+        if(hot/181>1){
+            count=hot/181;
+            loseimg.setImageResource(R.mipmap.step_drumsticks);
+        }
+        if(hot/456==1){
+            loseimg.setImageResource(R.mipmap.step_hamburger);
+        }
+        if(hot/456>1){
+            count=hot/456;
+            loseimg.setImageResource(R.mipmap.step_hamburger);
+        }
+        lose.setText(count+"");
+
     }
 
     @Override
@@ -539,5 +610,27 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
         score.add("2.1");
         score.add("5.3");
         score.add("17.1");*/
+    }
+
+    public static class MyBroad extends BroadcastReceiver {
+        public final String board="com.develop.sport.MYBROAD3";
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction().equals(board)){
+                state=true;
+
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mSensorManager.unregisterListener(this, mStepDetector);
+
+        mSensorManager.unregisterListener(this, mStepCount);
+        if(broad!=null){
+            getActivity().unregisterReceiver(broad);
+        }
     }
 }

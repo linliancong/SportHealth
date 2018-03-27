@@ -58,6 +58,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".MeRank">
+            <intent-filter>
+                <action android:name="android.intent.action.MERANK" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".Register">
             <intent-filter>
                 <action android:name="android.intent.action.REGISTER" />
@@ -135,12 +142,32 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".InteractAdd">
+            <intent-filter>
+                <action android:name="android.intent.action.INTERACTADD" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
 
-        <!-- 广播 -->
+        <!-- 更新资料广播 -->
         <receiver android:name=".MeSy$MyBroad">
             <intent-filter>
                 <action android:name="com.develop.sport.MYBROAD"/>
+            </intent-filter>
+        </receiver>
+        <!-- 分享广播 -->
+        <receiver android:name=".InteractSy$MyBroad">
+            <intent-filter>
+                <action android:name="com.develop.sport.MYBROAD2"/>
+            </intent-filter>
+        </receiver>
+
+        <!-- 运动完成广播 -->
+        <receiver android:name=".HomeSy$MyBroad">
+            <intent-filter>
+                <action android:name="com.develop.sport.MYBROAD3"/>
             </intent-filter>
         </receiver>
 
@@ -168,6 +195,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.BODY_SENSORS" />
+    
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     //地图包、搜索包需要的基础权限
 

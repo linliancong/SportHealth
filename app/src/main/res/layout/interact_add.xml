@@ -4,46 +4,42 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_white"
-    >
-
+    android:background="@color/background">
 
     <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="50dp"
         android:background="@color/bg_white"
         android:clickable="true"
         android:focusable="true"
         >
 
-
         <com.develop.tools.MyLayout
-            android:id="@+id/me_myly_update"
+            android:id="@+id/add_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
             android:paddingLeft="15dp"
             app:iconDrawable="@mipmap/back"
             app:iconDrawablePress="@mipmap/back_select"
             app:spacing="10dp"
             app:style="iconLeft"
-            app:text="更改"
-            app:textSize="18"
-            app:textColor="@color/black"
+            app:text="分享"
+            app:textSize="20"
             />
 
         <Button
-            android:id="@+id/me_btn_update"
-            android:layout_marginRight="15dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:layout_width="50dp"
-            android:layout_height="26dp"
-            android:background="@drawable/top_btn"
-            android:text="保存"
+            android:id="@+id/add_send"
+            android:layout_width="64dp"
+            android:layout_height="32dp"
+            android:layout_marginRight="20dp"
+            android:alpha="1"
+            android:text="发送"
             android:textColor="@color/bg_white"
-            android:textSize="12sp"
+            android:background="@drawable/button"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
             android:enabled="false"
             />
 
@@ -54,16 +50,29 @@
             android:layout_alignParentBottom="true"
             />
     </RelativeLayout>
-    <EditText
-        android:id="@+id/me_txt_update"
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginLeft="20dp"
-        android:background="@null"
-        android:drawableBottom="@drawable/line"
-        android:textSize="16sp"
-        />
+        android:background="@color/bg_white"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        >
+        <EditText
+            android:id="@+id/add_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:lines="14"
+            android:textSize="16sp"
+            android:hint="你的健身心得与体会..."
+            android:gravity="left"
+            android:maxLength="500"
+            />
+
+    </RelativeLayout>
+
 
 </LinearLayout>

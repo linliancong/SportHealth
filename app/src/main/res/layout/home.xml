@@ -88,14 +88,19 @@
                     android:layout_height="wrap_content"
                     android:text="热量"
                     android:gravity="center"
-                    android:layout_marginRight="40dp"
                     />
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:text="距离"
-                    android:layout_marginLeft="40dp"
+                    android:gravity="center"
+                    />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="消耗"
                     android:gravity="center"
                     />
             </LinearLayout>
@@ -131,8 +136,7 @@
                         android:text="千卡"
                         android:textColor="@color/black"
                         android:gravity="right"
-                        android:layout_marginRight="30dp"
-                        android:layout_marginLeft="4dp"
+                        android:paddingLeft="4dp"
                         android:layout_gravity="bottom"
                         />
                 </LinearLayout>
@@ -151,15 +155,40 @@
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/black"
-                        android:layout_marginLeft="40dp"
                         />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="公里"
                         android:textColor="@color/black"
-                        android:layout_marginLeft="4dp"
                         android:layout_gravity="bottom"
+                        android:paddingLeft="4dp"
+                        />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    >
+                    <TextView
+                        android:id="@+id/home_lose"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/black"
+                        />
+                    <ImageView
+                        android:id="@+id/home_loseimg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:src="@mipmap/step_egg"
+                        android:paddingLeft="4dp"
                         />
                 </LinearLayout>
             </LinearLayout>

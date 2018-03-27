@@ -3,6 +3,7 @@ package com.develop.sporthealth;
 import android.annotation.SuppressLint;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -56,7 +57,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
     private Map<String, String> map = new HashMap<>();
 
     private RelativeLayout tx;
-    private RelativeLayout zh;
+    private RelativeLayout dj;
     private RelativeLayout xm;
     private RelativeLayout xb;
     private RelativeLayout tz;
@@ -66,6 +67,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
     private RelativeLayout sz;
 
     private ImageView img;
+    private ImageView img_dj;
     private TextView tx_txt;
 	private TextView tx2_txt;
     private MyLayout zh_txt;
@@ -77,13 +79,15 @@ public class MeSy extends Fragment implements View.OnClickListener{
     private MyLayout qq_txt;
 
 
-    //通知主线程更新
+    //广播通知主线程更新
     private static boolean state=false;
     private MyBroad broad;
 
     private static final int REQUEST_CODE_PICK_IMAGE=1;
     private static final int REQUEST_CODE_CAPTURE_CAMEIA=2;
     private static final int CODE_RESULT_REQUEST=3;
+
+    private int count=0;
 
 
 
@@ -97,6 +101,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
                     break;
                 case 0x002:
                     sp.setIsUpdate(true);
+                    context.sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
                     break;
             }
         }
@@ -129,7 +134,28 @@ public class MeSy extends Fragment implements View.OnClickListener{
                 if (data.size() != 0) {
                     map = data.get(0);
                 }
+
+                //计算等级
+                data=op.select("select count(*) num from SportFinish where UserID=?", new String[]{sp.getID()});
+                if (data.size() != 0) {
+                    count=new Integer(data.get(0).get("num"));
+                    if(count<10){
+                        img_dj.setImageResource(R.mipmap.rank_level1);
+                    }else if(count<50){
+                        img_dj.setImageResource(R.mipmap.rank_level2);
+                    }else if(count<100){
+                        img_dj.setImageResource(R.mipmap.rank_level3);
+                    }else if(count<200){
+                        img_dj.setImageResource(R.mipmap.rank_level4);
+                    }else if(count>=200){
+                        img_dj.setImageResource(R.mipmap.rank_level5);
+                    }
+
+                }
             }
+
+
+
             new Thread(){
                 @Override
                 public void run() {
@@ -153,7 +179,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
         op=new SQLOperator(context);
         sp=new SPTools(context);
         tx=view.findViewById(R.id.me_ly_tx);
-        zh=view.findViewById(R.id.me_ly_zh);
+        dj=view.findViewById(R.id.me_ly_dj);
         xm=view.findViewById(R.id.me_ly_xm);
         xb=view.findViewById(R.id.me_ly_xb);
         tz=view.findViewById(R.id.me_ly_tz);
@@ -163,6 +189,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
         sz=view.findViewById(R.id.me_ly_sz);
 
         img=view.findViewById(R.id.me_img_tx);
+        img_dj=view.findViewById(R.id.me_img_dj);
         tx_txt=view.findViewById(R.id.me_txt_tx);
         tx2_txt=view.findViewById(R.id.me_txt_tx2);
         zh_txt=view.findViewById(R.id.me_myly_zh);
@@ -174,6 +201,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
         qq_txt=view.findViewById(R.id.me_myly_qq);
 
         tx.setOnClickListener(this);
+        dj.setOnClickListener(this);
         xm.setOnClickListener(this);
         xb.setOnClickListener(this);
         tz.setOnClickListener(this);
@@ -194,6 +222,14 @@ public class MeSy extends Fragment implements View.OnClickListener{
                 }else {
                     Intent it_tx=new Intent(context,Login.class);
                     startActivity(it_tx);
+                }
+                break;
+            case R.id.me_ly_dj:
+                if(sp.getIsLogin()) {
+                    Intent intent = new Intent(context,MeRank.class);
+                    startActivity(intent);
+                }else {
+                    Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.me_ly_zh:

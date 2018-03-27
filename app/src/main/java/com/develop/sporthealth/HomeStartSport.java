@@ -1,11 +1,13 @@
 package com.develop.sporthealth;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -37,6 +39,7 @@ import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.maps.model.Text;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
+import com.develop.tools.TimeTools;
 import com.develop.tools.database.SQLOperator;
 
 import java.text.DateFormat;
@@ -76,6 +79,8 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
     private Button play;
     private Button pause;
     private Button stop;
+
+    private Button share;
     //是否详细界面
     private boolean isShow=true;
     //是否开始跑步
@@ -134,6 +139,9 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
     private int H=0;
     private int M=0;
     private int S=0;
+
+
+    private PowerManager.WakeLock wakeLock;
 
     Handler handler=new Handler(){
         @Override
@@ -199,12 +207,14 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
         play=findViewById(R.id.start_play);
         pause=findViewById(R.id.start_pause);
         stop=findViewById(R.id.start_stop);
+        share=findViewById(R.id.start_share);
 
         start.setOnClickListener(this);
         slide.setOnClickListener(this);
         play.setOnClickListener(this);
         pause.setOnClickListener(this);
         stop.setOnClickListener(this);
+        share.setOnClickListener(this);
 
         //获取地图控件引用
         map=(MapView)findViewById(R.id.start_loction);
@@ -304,6 +314,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        releaseWakeLock();
         map.onDestroy();
         if(mapClient!=null) {
             mapClient.stopLocation();
@@ -432,6 +443,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 //点击开始跳转
                 initData();
                 if(isFinish) {
+                    acquireWakeLock();
                     visible.setVisibility(View.GONE);
                     visible2.setVisibility(View.VISIBLE);
                     title.setVisibility(View.GONE);
@@ -479,6 +491,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 pause.setVisibility(View.GONE);
                 stop.setVisibility(View.VISIBLE);
                 play.setVisibility(View.VISIBLE);
+                title.setVisibility(View.VISIBLE);
                 break;
             case R.id.start_play:
                 //继续
@@ -487,6 +500,46 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 pause.setVisibility(View.VISIBLE);
                 stop.setVisibility(View.GONE);
                 play.setVisibility(View.GONE);
+                title.setVisibility(View.GONE);
+                break;
+            case R.id.start_share:
+                //分享
+                //判断是否达标，达标则将数据计入完成表中
+                if(SportID.equals("2") && distance>=5 || SportID.equals("3") && distance>=10 || SportID.equals("4") && distance>=21.0975 || SportID.equals("5") && distance>=42.195)
+                {
+                    String title = "";
+                    String content = "";
+                    String time = TimeTools.getCurrentDate2();
+                    if (SportID.equals("2")) {
+                        title = "5公里跑步";
+                    }
+                    if (SportID.equals("3")) {
+                        title = "10公里跑步";
+                    }
+                    if (SportID.equals("4")) {
+                        title = "半程马拉松";
+                    }
+                    if (SportID.equals("5")) {
+                        title = "马拉松";
+                    }
+                    content = "我在" + TimeTools.getCurrentDate() + "完成了" + title + "任务！";
+
+                    op.insert("insert into Share(UserID,Title,Content,Date,Count) values(?,?,?,?,0)",
+                            new String[]{sp.getID(), title, content, time});
+                    //判断是否分享成功
+                    List<Map<String, String>> data = new ArrayList<>();
+                    data = op.select("select count(*) count from Share where UserID=? and Date=? ",
+                            new String[]{sp.getID(), time});
+                    if (data.get(0).get("count").equals("1")) {
+                        Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
+                        sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
+                    } else {
+                        Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else{
+                    Toast.makeText(context, "运动未达标！请先完成运动再来分享呦~", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }
@@ -509,7 +562,12 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
 
             }
             op.insert("update SportRunning set EndTime=?,Speed=?,Total=?,Time=?,Hot=? where StartTime=?",
-                    new String[]{endTime, rspeed, distance + "", totalTime + "", totalHot + "", startTime});
+                    new String[]{endTime, rspeed, db.format(distance) + "", totalTime + "", db.format(totalHot) + "", startTime});
+            //判断是否达标，达标则将数据计入完成表中
+            if(SportID.equals("2") && distance>=5 || SportID.equals("3") && distance>=10 || SportID.equals("4") && distance>=21.0975 || SportID.equals("5") && distance>=42.195){
+                op.insert("insert into SportFinish(UserID,SportID,Time) values(?,?,?)", new String[]{sp.getID(), SportID,TimeTools.getCurrentDate()});
+            }
+            sendBroadcast(new Intent("com.develop.sport.MYBROAD3").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.HomeSy$MyBroad")));
         }else{
             op.insert("delete from SportRunning where id=?",new String[]{RunID});
             op.insert("delete from SportLocation where RunID=?",new String[]{RunID});
@@ -545,6 +603,31 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
             super.onBackPressed();
         }else {
             Toast.makeText(context, "请先暂停，然后再双击退出按钮", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
+    // 获取电源锁，保持该服务在屏幕熄灭时仍然获取CPU时，保持运行
+    private void acquireWakeLock() {
+        if (null == wakeLock) {
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK
+                    | PowerManager.ON_AFTER_RELEASE, getClass()
+                    .getCanonicalName());
+            if (null != wakeLock) {
+                // Log.i(TAG, "call acquireWakeLock");
+                wakeLock.acquire();
+            }
+        }
+    }
+
+    // 释放设备电源锁
+    private void releaseWakeLock() {
+        if (null != wakeLock && wakeLock.isHeld()) {
+            // Log.i(TAG, "call releaseWakeLock");
+            wakeLock.release();
+            wakeLock = null;
         }
     }
 }

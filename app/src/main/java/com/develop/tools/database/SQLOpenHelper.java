@@ -174,6 +174,24 @@ public class SQLOpenHelper extends SQLiteOpenHelper {
                 "CurDate TEXT, " +
                 "TotalSteps TEXT)");
 
+        /**
+         * 表名：Share（分享信息表）
+         * 以下为各个字段
+         * id：
+         * UserID：用户编号
+         * Title：标题
+         * Content：内容
+         * Date：时间
+         * Count：点赞个数
+         * */
+        db.execSQL("create table if not exists Share"+
+                "(id integer primary key autoincrement,"+
+                "UserID integer,"+
+                "Title varchar(50),"+
+                "Content varchar(500),"+
+                "Date varchar(50),"+
+                "Count integer)");
+
     }
 
     @Override

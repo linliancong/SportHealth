@@ -65,6 +65,55 @@
             app:style="iconRight"
             />
 
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/black_line"
+        android:layout_marginLeft="85dp"
+        android:layout_marginRight="15dp"
+        />
+
+    <RelativeLayout
+        android:id="@+id/me_ly_dj"
+        android:layout_width="wrap_content"
+        android:layout_height="46dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:background="@drawable/layout_pressed"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:text="我的等级"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:layout_marginLeft="70dp"
+            />
+
+
+        <ImageView
+            android:id="@+id/me_img_dj"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerInParent="true"
+            android:layout_toLeftOf="@+id/me_right"
+            android:src="@mipmap/rank_level1"
+            />
+
+        <ImageView
+            android:id="@+id/me_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/right"
+            android:layout_centerInParent="true"
+            />
 
     </RelativeLayout>
 

@@ -122,8 +122,8 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
                                     }
                                 }
                             }
-
-                        } else {
+                        }
+                    }else {
                             Toast.makeText(context, "两次输入的密码不匹配，请重新输入", Toast.LENGTH_SHORT).show();
                             imgCode.setImageBitmap(CodeTools.getInstance().createBitmap());
                             realCode = CodeTools.getInstance().getCode().toLowerCase();
@@ -133,7 +133,6 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
                         imgCode.setImageBitmap(CodeTools.getInstance().createBitmap());
                         realCode = CodeTools.getInstance().getCode().toLowerCase();
                     }
-                }
                 break;
             case R.id.regi_imgcode:
                 imgCode.setImageBitmap(CodeTools.getInstance().createBitmap());

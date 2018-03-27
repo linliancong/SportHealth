@@ -21,6 +21,8 @@ public abstract class AdapterTools<T> extends BaseAdapter {
     private ArrayList<T> mData;
     private int mLayoutRes;         //布局id
 
+    private static onItemClickListener mOnItemClickListener;
+
     public AdapterTools(String[] data, int opc_list_item){}
     public AdapterTools(ArrayList<T> mData, int mLayoutRes)
     {
@@ -168,9 +170,14 @@ public abstract class AdapterTools<T> extends BaseAdapter {
         /**
          * 设置点击监听
          */
-        public ViewHolder setOnClickListener(int id, View.OnClickListener listener)
+        public ViewHolder setOnClickListener(int id)
         {
-            getView(id).setOnClickListener(listener);
+            getView(id).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickListener.onItemClick(getItemPosition());
+                }
+            });
             return this;
         }
 
@@ -193,4 +200,16 @@ public abstract class AdapterTools<T> extends BaseAdapter {
         }
 
     }
+
+    /**
+     * 按钮的监听接口
+     */
+    public interface onItemClickListener {
+        void onItemClick(int i);
+    }
+
+    public void setOnItemClickListener(onItemClickListener mOnItemClickListener) {
+        this.mOnItemClickListener = mOnItemClickListener;
+    }
+
 }
