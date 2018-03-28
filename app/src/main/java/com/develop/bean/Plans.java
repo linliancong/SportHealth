@@ -11,6 +11,7 @@ public class Plans {
     private String plan;
     private String summary;
     private String date;
+    private String SportID;
 
     public Plans(){}
 
@@ -51,5 +52,13 @@ public class Plans {
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public String getSportID() {
+        return SportID;
+    }
+
+    public void setSportID(String sportID) {
+        SportID = sportID;
     }
 }

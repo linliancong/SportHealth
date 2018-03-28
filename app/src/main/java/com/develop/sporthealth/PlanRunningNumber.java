@@ -131,9 +131,9 @@ public class PlanRunningNumber extends AppCompatActivity implements View.OnClick
             AVQuery<AVObject> query1 = new AVQuery<>("SportPlan");
             query1.whereEqualTo("UserID",sp.getID());
             AVQuery<AVObject> query2 = new AVQuery<>("SportPlan");
-            query2.whereNotEqualTo("SportID",1);
+            query2.whereNotEqualTo("SportID","1");
             AVQuery<AVObject> query3 = new AVQuery<>("SportPlan");
-            query2.whereEqualTo("State",1);
+            query2.whereEqualTo("State","1");
             AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2,query3));
             query.findInBackground(new FindCallback<AVObject>() {
                 @Override

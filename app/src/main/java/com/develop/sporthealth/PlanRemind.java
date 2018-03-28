@@ -57,6 +57,7 @@ public class PlanRemind extends AppCompatActivity {
     }
 
     private void getData() {
+
         List<Map<String, String>> data = new ArrayList<>();
         //判断步数
         data = op.select("select count(*) num from SportFinish where UserID=? and SportID=1 and Time=?", new String[]{sp.getID(), TimeTools.getCurrentDate()});

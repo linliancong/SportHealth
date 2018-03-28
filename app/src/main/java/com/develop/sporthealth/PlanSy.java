@@ -54,34 +54,24 @@ public class PlanSy extends Fragment implements View.OnClickListener{
             switch (msg.what) {
                 case 0x001:
                     //op.insert("update Messages set State=2 where Date=? and UserID=?", new String[]{TimeTools.getCurrentDate(),sp.getID()});
-                    AVQuery<AVObject> query1 = new AVQuery<>("UserInfo");
+                    AVQuery<AVObject> query1 = new AVQuery<>("Messages");
                     query1.whereEqualTo("Date",TimeTools.getCurrentDate());
-                    AVQuery<AVObject> query2 = new AVQuery<>("UserInfo");
-                    query2.whereEqualTo("UserName",sp.getUserName());
-                    AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+                    AVQuery<AVObject> query2 = new AVQuery<>("Messages");
+                    query2.whereEqualTo("UserID",sp.getID());
+                    AVQuery<AVObject> query3 = new AVQuery<>("Messages");
+                    query2.whereEqualTo("State","1");
+                    AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2,query3));
                     query.findInBackground(new FindCallback<AVObject>() {
                            @Override
                            public void done(List<AVObject> list, AVException e) {
                                if(list.size()>0) {
                                    // 第一参数是 className,第二个参数是 objectId
                                    AVObject testObject1 = AVObject.createWithoutData("Messages", list.get(0).getObjectId());
-                                   testObject1.put("State", 2);
+                                   testObject1.put("State", "2");
                                    // 保存到云端
                                    testObject1.saveInBackground();
-                                   //查询是否更新成功
-                                   AVQuery<AVObject> query1 = new AVQuery<>("Messages");
-                                   query1.whereEqualTo("Date",TimeTools.getCurrentDate());
-                                   AVQuery<AVObject> query2 = new AVQuery<>("Messages");
-                                   query2.whereEqualTo("UserName",sp.getUserName());
-                                   AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
-                                   query.findInBackground(new FindCallback<AVObject>() {
-                                       @Override
-                                       public void done(List<AVObject> list, AVException e) {
-                                           if(list.size()>0){
-                                               getVisible();
-                                           }
-                                       }
-                                   });
+
+                                   getVisible();
                                }
 
                            }
@@ -109,6 +99,31 @@ public class PlanSy extends Fragment implements View.OnClickListener{
             init();
 
 
+            //判断是否有计划，没有的话从服务器同步
+            List<Map<String, String>> data = new ArrayList<>();
+            data = op.select("select count(*) num from SportPlan where UserID=? and SportID=1 ", new String[]{sp.getID()});
+            if (data.get(0).get("num").equals("0")) {
+                AVQuery<AVObject> query1 = new AVQuery<>("SportPlan");
+                query1.whereEqualTo("UserID", sp.getID());
+                AVQuery<AVObject> query2 = new AVQuery<>("SportPlan");
+                query2.whereEqualTo("State", "1");
+                AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+                query.findInBackground(new FindCallback<AVObject>() {
+                    @Override
+                    public void done(List<AVObject> list, AVException e) {
+                        if (list.size() > 0) {
+                            for (int i = 0; i < list.size(); i++) {
+                                op.insert("insert into SportPlan(UserID,SportID,State,StartDate,Target) values(?,?,?,?,?)", new String[]{sp.getID(),
+                                        list.get(i).get("SportID").toString(), list.get(i).get("State").toString(),
+                                        list.get(i).get("StartDate").toString(), list.get(i).get("Target").toString()});
+                            }
+
+                        }
+                    }
+                });
+            }
+
+
             getVisible();
 
         }
@@ -129,7 +144,7 @@ public class PlanSy extends Fragment implements View.OnClickListener{
                     AVObject testObject1 = new AVObject("Messages");
                     testObject1.put("UserID",sp.getID());
                     testObject1.put("Date",TimeTools.getCurrentDate());
-                    testObject1.put("State",1);
+                    testObject1.put("State","1");
                     testObject1.put("Title","计划提醒");
                     testObject1.saveInBackground(new SaveCallback() {
                         @Override
@@ -147,16 +162,16 @@ public class PlanSy extends Fragment implements View.OnClickListener{
                 op.insert("insert into Messages(UserID,Date,State,Title) values(?,?,1,?)", new String[]{sp.getID(),TimeTools.getCurrentDate(),"计划提醒"});
             }
         }*/
-        //判断今天的消息是否未读
 
-        AVQuery<AVObject> query11 = new AVQuery<>("Messages");
-        query1.whereEqualTo("UserID",sp.getID());
-        AVQuery<AVObject> query21 = new AVQuery<>("Messages");
-        query2.whereEqualTo("Date",TimeTools.getCurrentDate());
-        AVQuery<AVObject> query31 = new AVQuery<>("Messages");
-        query2.whereEqualTo("State",1);
-        AVQuery<AVObject> query4 = AVQuery.and(Arrays.asList(query11, query21,query31));
-        query4.findInBackground(new FindCallback<AVObject>() {
+        //判断今天的消息是否未读
+        query1 = new AVQuery<>("Messages");
+        query1.whereEqualTo("Date",TimeTools.getCurrentDate());
+        query2 = new AVQuery<>("Messages");
+        query2.whereEqualTo("UserID",sp.getID());
+        AVQuery<AVObject> query3 = new AVQuery<>("Messages");
+        query2.whereEqualTo("State","1");
+        query = AVQuery.and(Arrays.asList(query1, query2,query3));
+        query.findInBackground(new FindCallback<AVObject>() {
             @Override
             public void done(List<AVObject> list, AVException e) {
                 if(list.size()>0) {
@@ -166,7 +181,7 @@ public class PlanSy extends Fragment implements View.OnClickListener{
                 }
             }
         });
-        /*data = op.select("select count(1) num from Messages where UserID=? and State=1 and Date=?", new String[]{sp.getID(), TimeTools.getCurrentDate()});
+            /*data = op.select("select count(1) num from Messages where UserID=? and State=1 and Date=?", new String[]{sp.getID(), TimeTools.getCurrentDate()});
         if (data.size() != 0) {
             if(data.get(0).get("num").equals("1")){
                 remind_v.setVisibility(View.VISIBLE);

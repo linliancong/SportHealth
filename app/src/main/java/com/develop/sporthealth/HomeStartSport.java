@@ -464,7 +464,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     markers=new ArrayList<>();
                 }
                 // 测试 SDK 是否正常工作的代码
-                AVObject testObject = new AVObject("TestObject1111");
+                /*AVObject testObject = new AVObject("TestObject1111");
                 testObject.put("words","Hello World!");
                 testObject.saveInBackground(new SaveCallback() {
                     @Override
@@ -473,7 +473,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                             Log.d("saved","success!");
                         }
                     }
-                });
+                });*/
                 break;
             case R.id.start_slide:
                 if(isShow) {
