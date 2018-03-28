@@ -1,6 +1,7 @@
 package com.develop.sporthealth;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
@@ -10,11 +11,15 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.SaveCallback;
 import com.develop.bean.StepEntity;
 import com.develop.tools.AppManager;
 import com.develop.tools.CheckPermissionsTools;
 import com.develop.tools.FragmentAdapter;
 import com.develop.tools.SPTools;
+import com.develop.tools.TimeTools;
 import com.develop.tools.database.SQLOperator;
 
 
@@ -73,6 +78,92 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
             op.insert("insert into SportInfo(Name,Summary) values(?,?)",new String[]{"马拉松","如果你可以坚持着跑下来，那么不就的将来你就是马拉松冠军的热门人选了，加油！"});
             sp.setIsFirst(false);
         }
+
+        /*//消息表
+        AVObject testObject1 = new AVObject("Messages");
+        testObject1.put("UserID", "");
+        testObject1.put("Date", "");
+        testObject1.put("State","");
+        testObject1.put("Title","");
+        testObject1.put("Content","");
+        testObject1.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+            }
+        });
+        //步数表
+        testObject1 = new AVObject("Step");
+        testObject1.put("UserID","");
+        testObject1.put("Date", "");
+        testObject1.put("TotalSteps","");
+        testObject1.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+            }
+        });
+        //分享信息表
+        testObject1 = new AVObject("Share");
+        testObject1.put("UserID","");
+        testObject1.put("Date", "");
+        testObject1.put("Title","");
+        testObject1.put("Content", "");
+        testObject1.put("Count","");
+        testObject1.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+            }
+        });
+        //运动完成情况表
+        testObject1 = new AVObject("SportFinish");
+        testObject1.put("UserID","");
+        testObject1.put("Time", "");
+        testObject1.put("SportID","");
+        testObject1.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+            }
+        });
+        //跑步统计表
+        testObject1 = new AVObject("SportRunning");
+        testObject1.put("UserID","");
+        testObject1.put("SportID", "");
+        testObject1.put("Total","");
+        testObject1.put("Time", "");
+        testObject1.put("Speed","");
+        testObject1.put("Hot","");
+        testObject1.put("StartTime", "");
+        testObject1.put("EndTime","");
+        testObject1.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+            }
+        });
+        //运动轨迹表
+        testObject1 = new AVObject("SportLocation");
+        testObject1.put("UserID","");
+        testObject1.put("RunID", "");
+        testObject1.put("Longitude","");
+        testObject1.put("Latitude", "");
+        testObject1.put("Speed","");
+        testObject1.put("Time","");
+        testObject1.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+            }
+        });
+        //运动轨迹表
+        testObject1 = new AVObject("SportPlan");
+        testObject1.put("UserID","");
+        testObject1.put("SportID", "");
+        testObject1.put("State","");
+        testObject1.put("Target", "");
+        testObject1.put("StartDate","");
+        testObject1.put("FinalDate","");
+        testObject1.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+            }
+        });*/
 
         mAdapter=new FragmentAdapter(getSupportFragmentManager(),MainActivity.this);
         bindView();

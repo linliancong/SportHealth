@@ -16,12 +16,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
 import com.develop.tools.AppManager;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,18 +62,16 @@ public class MePwd extends AppCompatActivity implements TextWatcher{
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 0x001:
-                    if(state==1){
-                        //密码更改成功
-                        dialog.show();
-                        txt= view.findViewById(R.id.ad_txt_erro2);
-                        txt.setText("密码修改成功，请返回重新登录。");
-                    }
-                    else{
-                        //更改密码失败
-                        dialog.show();
-                        txt=view.findViewById(R.id.ad_txt_erro2);
-                        txt.setText("密码修改失败，请稍后再试。");
-                    }
+                    //密码更改成功
+                    dialog.show();
+                    txt= view.findViewById(R.id.ad_txt_erro2);
+                    txt.setText("密码修改成功，请返回重新登录。");
+                    break;
+                case 0x002:
+                    //更改密码失败
+                    dialog.show();
+                    txt=view.findViewById(R.id.ad_txt_erro2);
+                    txt.setText("密码修改失败，请稍后再试。");
                     break;
             }
         }
@@ -112,7 +115,35 @@ public class MePwd extends AppCompatActivity implements TextWatcher{
                     }
                     //在这里做修改密码的操作
                     else{
-                        List<Map<String, String>> data = new ArrayList<>();
+
+                        // 第一参数是 className,第二个参数是 objectId
+                        AVObject testObject1 = AVObject.createWithoutData("UserInfo", sp.getID());
+
+                        testObject1.put("Password",person_edit_newpass_pwd.getText().toString());
+                        // 保存到云端
+                        testObject1.saveInBackground();
+                        //查询是否更新成功
+                        AVQuery<AVObject> query1 = new AVQuery<>("UserInfo");
+                        query1.whereEqualTo("Password",person_edit_newpass_pwd.getText().toString());
+                        AVQuery<AVObject> query2 = new AVQuery<>("UserInfo");
+                        query2.whereEqualTo("UserName",sp.getUserName());
+                        AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+                        query.findInBackground(new FindCallback<AVObject>() {
+                            @Override
+                            public void done(List<AVObject> list, AVException e) {
+                                if(list.size()>0){
+                                    state=1;
+                                    sp.setPWD("");
+                                    handler.sendEmptyMessage(0x001);
+                                }else {
+                                    state=0;
+                                    handler.sendEmptyMessage(0x002);
+                                }
+                            }
+                        });
+                        handler.sendEmptyMessage(0x001);
+
+                        /*List<Map<String, String>> data = new ArrayList<>();
                         Map<String, String> map = new HashMap<>();
                         op.insert("update UserInfo set Password=? where id=?", new String[]{person_edit_newpass_pwd.getText().toString(), sp.getID()});
                         //判断是否修改成功
@@ -126,7 +157,7 @@ public class MePwd extends AppCompatActivity implements TextWatcher{
                                 state=0;
                             }
                         }
-                        handler.sendEmptyMessage(0x001);
+                        handler.sendEmptyMessage(0x001);*/
                     }
                 }
                 else{

@@ -12,10 +12,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,29 +77,35 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.login:
-                List<Map<String, String>> data = new ArrayList<>();
-                Map<String, String> map = new HashMap<>();
-                data = op.select("select * from UserInfo where UserName=? and Password=?", new String[]{user.getText().toString(), pwd.getText().toString()});
-                if (data.size()!=0) {
-                    map = data.get(0);
-                    //登录成功
-                    sp.setIsFirst(false);
-                    sp.setID(map.get("id"));
-                    sp.setUserName(map.get("UserName"));
-                    sp.setPWD(map.get("Password"));
-                    sp.setName(map.get("Name"));
-                    if(map.get("Weight")!=null) {
-                        sp.setWeight(new Float(map.get("Weight")).floatValue());
+                AVQuery<AVObject> query1 = new AVQuery<>("UserInfo");
+                query1.whereEqualTo("UserName",user.getText().toString());
+                AVQuery<AVObject> query2 = new AVQuery<>("UserInfo");
+                query2.whereEqualTo("Password",pwd.getText().toString());
+                AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+                query.findInBackground(new FindCallback<AVObject>() {
+                    @Override
+                    public void done(List<AVObject> list, AVException e) {
+                        if(list.size()>0) {
+                            sp.setIsFirst(false);
+                            sp.setID(list.get(0).getObjectId().toString());
+                            sp.setUserName(list.get(0).get("UserName").toString());
+                            sp.setPWD(list.get(0).get("Password").toString());
+                            sp.setName(list.get(0).get("Name").toString());
+                            String str=list.get(0).get("Weight").toString();
+                            if (!list.get(0).get("Weight").toString().equals("")) {
+                                sp.setWeight(new Float(list.get(0).get("Weight").toString()).floatValue());
+                            }
+                            //设置登录标记
+                            sp.setIsLogin(true);
+                            //登录成功通知更新
+                            sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
+                            finish();
+                        }else {
+                            //登录失败
+                            Toast.makeText(context, "用户名或密码有误，请重新输入！", Toast.LENGTH_SHORT).show();
+                        }
                     }
-                    //设置登录标记
-                    sp.setIsLogin(true);
-                    //登录成功通知更新
-                    sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
-                    finish();
-                }else {
-                    //登录失败
-                    Toast.makeText(context, "用户名或密码有误，请重新输入！", Toast.LENGTH_SHORT).show();
-                }
+                });
                 break;
             case R.id.login_cancel:
                 //取消

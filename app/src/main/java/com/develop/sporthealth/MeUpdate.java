@@ -16,10 +16,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +133,31 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
     }
 
     private void update(String sql) {
-        List<Map<String, String>> data = new ArrayList<>();
+
+        // 第一参数是 className,第二个参数是 objectId
+        AVObject testObject1 = AVObject.createWithoutData("UserInfo", sp.getID());
+
+        testObject1.put(sql,input.getText().toString());
+        // 保存到云端
+        testObject1.saveInBackground();
+        //查询是否更新成功
+        AVQuery<AVObject> query1 = new AVQuery<>("UserInfo");
+        query1.whereEqualTo(sql,input.getText().toString());
+        AVQuery<AVObject> query2 = new AVQuery<>("UserInfo");
+        query2.whereEqualTo("UserName",sp.getUserName());
+        AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+        query.findInBackground(new FindCallback<AVObject>() {
+            @Override
+            public void done(List<AVObject> list, AVException e) {
+                if(list.size()>0){
+                    handler.sendEmptyMessage(0x001);
+                }else {
+                    handler.sendEmptyMessage(0x002);
+                }
+            }
+        });
+
+       /* List<Map<String, String>> data = new ArrayList<>();
         Map<String, String> map = new HashMap<>();
         op.insert("update UserInfo set "+sql+"=? where id=?", new String[]{input.getText().toString(),sp.getID()});
         //判断是否修改成功
@@ -140,7 +169,7 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
             }else {
                 handler.sendEmptyMessage(0x002);
             }
-        }
+        }*/
     }
 
     @Override

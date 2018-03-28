@@ -1,6 +1,8 @@
 package com.develop.sporthealth;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,12 +14,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVCloudQueryResult;
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.CloudQueryCallback;
+import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.SaveCallback;
 import com.develop.tools.CodeTools;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
+import com.develop.tools.TimeTools;
 import com.develop.tools.database.SQLOperator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +54,8 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
 
     //生成的验证码
     private String realCode;
+
+    private String cql="";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +94,7 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
                 finish();
             }
         });
+
     }
 
     @Override
@@ -92,37 +106,51 @@ public class Register extends AppCompatActivity implements View.OnClickListener,
                     //判断密码
                     if (pwd1.getText().toString().equals(pwd2.getText().toString())) {
                         //判断用户名
-                        List<Map<String, String>> data = new ArrayList<>();
-                        Map<String, String> map = new HashMap<>();
-                        data = op.select("select count(1) num from UserInfo where UserName=?", new String[]{user.getText().toString()});
-                        if (data.size() != 0) {
-                            map = data.get(0);
-                            if (map.get("num").toString().equals("1")) {
-                                Toast.makeText(context, "用户名已存在，重新输入用户名", Toast.LENGTH_SHORT).show();
-                                imgCode.setImageBitmap(CodeTools.getInstance().createBitmap());
-                                realCode = CodeTools.getInstance().getCode().toLowerCase();
-                            } else {
-                                //判断邮箱
-                                data = new ArrayList<>();
-                                map = new HashMap<>();
-                                data = op.select("select count(1) num from UserInfo where Email=?", new String[]{email.getText().toString()});
-                                if (data.size() != 0) {
-                                    map = data.get(0);
-                                    if (map.get("num").toString().equals("1")) {
-                                        Toast.makeText(context, "邮箱已存在，重新输入邮箱或者找回密码", Toast.LENGTH_SHORT).show();
-                                        imgCode.setImageBitmap(CodeTools.getInstance().createBitmap());
-                                        realCode = CodeTools.getInstance().getCode().toLowerCase();
-                                    } else {
-                                        op.insert("insert into UserInfo(UserName,Password,Email,Name) values(?,?,?,?)", new String[]{user.getText().toString(),
-                                                pwd1.getText().toString(), email.getText().toString(), user.getText().toString()});
-                                        Toast.makeText(context, "注册成功！返回重新登录", Toast.LENGTH_SHORT).show();
-                                        /*Intent intent = new Intent(context, Login.class);
-                                        startActivity(intent);*/
-                                        finish();
-                                    }
+                        AVQuery<AVObject> query = new AVQuery<>("UserInfo");
+                        query.whereEqualTo("UserName",user.getText().toString());
+                        query.findInBackground(new FindCallback<AVObject>() {
+                            @Override
+                            public void done(List<AVObject> list, AVException e) {
+                                if(list.size()>0){
+                                    Toast.makeText(context, "用户名已存在，重新输入用户名", Toast.LENGTH_SHORT).show();
+                                    imgCode.setImageBitmap(CodeTools.getInstance().createBitmap());
+                                    realCode = CodeTools.getInstance().getCode().toLowerCase();
+                                }else {
+                                    AVQuery<AVObject> query = new AVQuery<>("UserInfo");
+                                    query.whereEqualTo("Email",email.getText().toString());
+                                    query.findInBackground(new FindCallback<AVObject>() {
+                                        @Override
+                                        public void done(List<AVObject> list, AVException e) {
+                                            if(list.size()>0){
+                                                Toast.makeText(context, "邮箱已存在，重新输入邮箱或者找回密码", Toast.LENGTH_SHORT).show();
+                                                imgCode.setImageBitmap(CodeTools.getInstance().createBitmap());
+                                                realCode = CodeTools.getInstance().getCode().toLowerCase();
+                                            }else {
+                                                AVObject testObject1 = new AVObject("UserInfo");
+                                                testObject1.put("UserName",user.getText().toString());
+                                                testObject1.put("Password",pwd1.getText().toString());
+                                                testObject1.put("Email",email.getText().toString());
+                                                testObject1.put("Name",user.getText().toString());
+                                                testObject1.saveInBackground(new SaveCallback() {
+                                                    @Override
+                                                    public void done(AVException e) {
+                                                        if(e == null){
+                                                            Toast.makeText(context, "注册成功", Toast.LENGTH_SHORT).show();
+                                                            sp.setUserName(user.getText().toString());
+                                                            Intent intent=new Intent(context,RegisterInfo.class);
+                                                            startActivity(intent);
+                                                            finish();
+                                                        }else{
+                                                            Toast.makeText(context, "注册失败，请稍后重试", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
                                 }
                             }
-                        }
+                        });
                     }else {
                             Toast.makeText(context, "两次输入的密码不匹配，请重新输入", Toast.LENGTH_SHORT).show();
                             imgCode.setImageBitmap(CodeTools.getInstance().createBitmap());

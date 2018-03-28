@@ -194,12 +194,36 @@
             </LinearLayout>
         </RelativeLayout>
 
+        <LinearLayout
+            android:id="@+id/home_rl3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bg_white"
+            android:layout_below="@+id/home_rl1"
+            android:padding="10dp"
+            android:layout_marginTop="10dp"
+            >
+            <Button
+                android:id="@+id/home_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/home_rl2"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:alpha="1"
+                android:text="开始运动"
+                android:textSize="18sp"
+                android:textColor="@color/bg_white"
+                android:background="@drawable/button"
+                />
+
+        </LinearLayout>
+
         <RelativeLayout
             android:id="@+id/home_rl2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/home_rl1"
-            android:layout_marginTop="10dp"
+            android:layout_below="@+id/home_rl3"
             android:background="@color/bg_white"
             >
             <ImageView
@@ -296,21 +320,6 @@
                 />
 
         </RelativeLayout>
-
-        <Button
-            android:id="@+id/home_start"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/home_rl2"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:alpha="1"
-            android:text="开始运动"
-            android:textSize="18sp"
-            android:textColor="@color/bg_white"
-            android:background="@drawable/button"
-            />
 
     </RelativeLayout>
 </ScrollView>

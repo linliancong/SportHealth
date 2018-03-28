@@ -29,6 +29,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.GetCallback;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
@@ -130,11 +134,6 @@ public class MeSy extends Fragment implements View.OnClickListener{
             getActivity().registerReceiver(broad,filter);
 
             if(!sp.getIsLogin()) {
-                data = op.select("select * from UserInfo where id=?", new String[]{sp.getID()});
-                if (data.size() != 0) {
-                    map = data.get(0);
-                }
-
                 //计算等级
                 data=op.select("select count(*) num from SportFinish where UserID=?", new String[]{sp.getID()});
                 if (data.size() != 0) {
@@ -366,25 +365,29 @@ public class MeSy extends Fragment implements View.OnClickListener{
             yx_txt.setText("");
             sj_txt.setText("");
             qq_txt.setText("");
-            map=new HashMap<>();
+            img.setImageResource(R.mipmap.ic_launcher_round);
         }else {
-            data = op.select("select * from UserInfo where id=?", new String[]{sp.getID()});
-            if (data.size()!=0) {
-                map = data.get(0);
-                tx_txt.setText(map.get("Name"));
-                tx2_txt.setText(map.get("UserName"));
-                zh_txt.setText(map.get("UserName"));
-                xm_txt.setText(map.get("Name"));
-                xb_txt.setText(map.get("Sex"));
-                tz_txt.setText(map.get("Weight"));
-                if(map.get("Weight")!=null) {
-                    sp.setWeight(new Float(map.get("Weight")));
+            AVQuery<AVObject> avQuery = new AVQuery<>("UserInfo");
+            avQuery.getInBackground(sp.getID(), new GetCallback<AVObject>() {
+                @Override
+                public void done(AVObject avObject, AVException e) {
+                    if (avObject != null) {
+                        tx_txt.setText(avObject.get("Name").toString());
+                        tx2_txt.setText(avObject.get("UserName").toString());
+                        zh_txt.setText(avObject.get("UserName").toString());
+                        xm_txt.setText(avObject.get("Name").toString());
+                        xb_txt.setText(avObject.get("Sex").toString());
+                        tz_txt.setText(avObject.get("Weight").toString());
+                        if (!avObject.get("Weight").toString().equals("")) {
+                            sp.setWeight(new Float(avObject.get("Weight").toString()));
+                        }
+                        yx_txt.setText(avObject.get("Email").toString());
+                        sj_txt.setText(avObject.get("Phone").toString());
+                        qq_txt.setText(avObject.get("QQ").toString());
+                    }
                 }
-                yx_txt.setText(map.get("Email"));
-                sj_txt.setText(map.get("Phone"));
-                qq_txt.setText(map.get("QQ"));
+            });
 
-            }
         }
 
     }

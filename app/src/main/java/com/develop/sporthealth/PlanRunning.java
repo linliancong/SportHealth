@@ -11,12 +11,17 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
 import com.develop.tools.AppManager;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +104,34 @@ public class PlanRunning extends AppCompatActivity implements View.OnClickListen
             }else if(map.get("SportID").equals("5")){
                 rb4.setChecked(true);
             }
+
+        }else {
+            AVQuery<AVObject> query1 = new AVQuery<>("SportPlan");
+            query1.whereEqualTo("UserID",sp.getID());
+            AVQuery<AVObject> query2 = new AVQuery<>("SportPlan");
+            query2.whereNotEqualTo("SportID",1);
+            AVQuery<AVObject> query3 = new AVQuery<>("SportPlan");
+            query2.whereEqualTo("State",1);
+            AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2,query3));
+            query.findInBackground(new FindCallback<AVObject>() {
+                @Override
+                public void done(List<AVObject> list, AVException e) {
+                    if(list.size()>0) {
+                        isData = true;
+                        if (list.get(0).get("SportID").equals("2")) {
+                            rb1.setChecked(true);
+                        } else if (list.get(0).get("SportID").equals("3")) {
+                            rb2.setChecked(true);
+                        } else if (list.get(0).get("SportID").equals("4")) {
+                            rb3.setChecked(true);
+                        } else if (list.get(0).get("Target").equals("5")) {
+                            rb4.setChecked(true);
+                        }
+
+                    }
+
+                }
+            });
 
         }
     }
