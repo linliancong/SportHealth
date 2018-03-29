@@ -95,8 +95,9 @@ public class SQLOperator {
         SQLiteDatabase db = openHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put("CurDate", stepEntity.getCurDate());
+        values.put("Date", stepEntity.getCurDate());
         values.put("TotalSteps", stepEntity.getSteps());
+        values.put("UserID", stepEntity.getUserID());
         db.insert("Step", null, values);
 
         db.close();
@@ -108,12 +109,14 @@ public class SQLOperator {
      * @param curDate
      * @return
      */
-    public StepEntity getCurDataByDate(String curDate) {
+    public StepEntity getCurDataByDate(String curDate,String userID) {
         SQLiteDatabase db = openHelper.getWritableDatabase();
         StepEntity stepEntity = null;
-        Cursor cursor = db.query("Step", null, null, null, null, null, null);
+        String str="select * from Step where Date=? and UserID=?";
+        Cursor cursor = db.rawQuery(str,new String[]{curDate,userID});
+        //Cursor cursor = db.query("Step", null, null, null, null, null, null);
         while (cursor.moveToNext()) {
-            String date = cursor.getString(cursor.getColumnIndexOrThrow("CurDate"));
+            String date = cursor.getString(cursor.getColumnIndexOrThrow("Date"));
             if (curDate.equals(date)) {
                 String steps = cursor.getString(cursor.getColumnIndexOrThrow("TotalSteps"));
                 stepEntity = new StepEntity(date, steps);
@@ -135,9 +138,10 @@ public class SQLOperator {
         SQLiteDatabase db = openHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put("CurDate",stepEntity.getCurDate());
+        values.put("Date",stepEntity.getCurDate());
         values.put("TotalSteps", stepEntity.getSteps());
-        db.update("Step", values, "CurDate=?", new String[]{stepEntity.getCurDate()});
+        values.put("UserID", stepEntity.getUserID());
+        db.update("Step", values, "Date=? and UserID=?", new String[]{stepEntity.getCurDate(),stepEntity.getUserID()});
 
         db.close();
     }

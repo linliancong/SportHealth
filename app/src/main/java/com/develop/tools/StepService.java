@@ -21,14 +21,24 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.SaveCallback;
 import com.develop.bean.StepEntity;
 import com.develop.sporthealth.MainActivity;
 import com.develop.sporthealth.R;
+import com.develop.sporthealth.RegisterInfo;
 import com.develop.tools.database.SQLOperator;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 
 public class StepService extends Service implements SensorEventListener {
@@ -61,6 +71,8 @@ public class StepService extends Service implements SensorEventListener {
     private NotificationManager notificationManager;
     private Intent nfIntent;
 
+    private SPTools sp;
+
 
     @Override
     public void onCreate() {
@@ -72,6 +84,7 @@ public class StepService extends Service implements SensorEventListener {
             }
         }).start();
         //startTimeCount();
+        sp=new SPTools(StepService.this);
         initTodayData();
     }
 
@@ -205,7 +218,7 @@ public class StepService extends Service implements SensorEventListener {
         //获取数据库
         op = new SQLOperator(getApplicationContext());
         //获取当天的数据，用于展示
-        StepEntity entity = op.getCurDataByDate(CURRENT_DATE);
+        StepEntity entity = op.getCurDataByDate(CURRENT_DATE,sp.getID());
         //为空则说明还没有该天的数据，有则说明已经开始当天的计步了
         if (entity == null) {
             CURRENT_STEP = 0;
@@ -300,20 +313,54 @@ public class StepService extends Service implements SensorEventListener {
      */
     private void saveStepData() {
         //查询数据库中的数据
-        StepEntity entity = op.getCurDataByDate(CURRENT_DATE);
+        StepEntity entity = op.getCurDataByDate(CURRENT_DATE,sp.getID());
         //为空则说明还没有该天的数据，有则说明已经开始当天的计步了
         if (entity == null) {
             //没有则新建一条数据
             entity = new StepEntity();
             entity.setCurDate(CURRENT_DATE);
             entity.setSteps(String.valueOf(CURRENT_STEP));
+            entity.setUserID(sp.getID());
 
             op.addNewData(entity);
+
+            //这里新增一条数据传到服务器
+            AVObject testObject1 = new AVObject("Step");
+            testObject1.put("TotalSteps",entity.getSteps());
+            testObject1.put("UserID",entity.getUserID());
+            testObject1.put("Date",entity.getCurDate());
+            testObject1.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(AVException e) {
+                }
+            });
         } else {
             //有则更新当前的数据
             entity.setSteps(String.valueOf(CURRENT_STEP));
+            entity.setUserID(sp.getID());
 
             op.updateCurData(entity);
+
+            //这里更新数据传到服务器
+            AVQuery<AVObject> query1 = new AVQuery<>("Step");
+            query1.whereEqualTo("UserID",entity.getUserID());
+            AVQuery<AVObject> query2 = new AVQuery<>("Step");
+            query2.whereEqualTo("Date",entity.getCurDate());
+            AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+            query.findInBackground(new FindCallback<AVObject>() {
+                @Override
+                public void done(List<AVObject> list, AVException e) {
+                    if(list.size()>0){
+                        // 第一参数是 className,第二个参数是 objectId
+                        AVObject testObject1 = AVObject.createWithoutData("Step", list.get(0).getObjectId());
+
+                        testObject1.put("TotalSteps",String.valueOf(CURRENT_STEP));
+
+                        // 保存到云端
+                        testObject1.saveInBackground();
+                    }
+                }
+            });
         }
 
         builder.setContentIntent(PendingIntent.getActivity(this, 0, nfIntent, 0)) // 设置PendingIntent

@@ -65,7 +65,7 @@ public class PlanRemind extends AppCompatActivity {
             if(data.get(0).get("num").equals("1")){
                 walk.setText("恭喜你已经完成今天的步数目标！继续努力呦~");
             }else {
-                data= op.select("select a.Target,b.TotalSteps from SportPlan a,Step b where a.SportID=1 and a.State=1 and b.CurDate=?", new String[]{TimeTools.getCurrentDate()});
+                data= op.select("select a.Target,b.TotalSteps from SportPlan a,Step b where a.UserID=b.UserID and a.SportID=1 and a.State=1 and b.Date=? and a.UserID=?", new String[]{TimeTools.getCurrentDate(),sp.getID()});
                 if (data.size() != 0) {
                     int targer=new Integer(data.get(0).get("Target")).intValue();
                     int step=new Integer(data.get(0).get("TotalSteps")).intValue();

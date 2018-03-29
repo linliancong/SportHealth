@@ -14,6 +14,7 @@ public class ShareMsg {
     private String userID;
     private String num;
     private String id;
+    private String imageUrl;
 
 
     public ShareMsg(){}
@@ -64,5 +65,13 @@ public class ShareMsg {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

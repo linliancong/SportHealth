@@ -166,12 +166,14 @@ public class SQLOpenHelper extends SQLiteOpenHelper {
          * 表名：Step（步数表）
          * 以下为各个字段
          * id：
-         * CurDate：时间
+         * UserID：用户编号
+         * Date：时间
          * TotalSteps：步数
          * */
         db.execSQL("create table Step (" +
                 "id integer primary key autoincrement, " +
-                "CurDate TEXT, " +
+                "UserID varchar(50), " +
+                "Date TEXT, " +
                 "TotalSteps TEXT)");
 
         /**

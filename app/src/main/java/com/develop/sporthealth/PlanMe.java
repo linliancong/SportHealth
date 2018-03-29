@@ -84,6 +84,10 @@ public class PlanMe extends AppCompatActivity {
 
     private void getData() {
         List<Map<String, String>> data = new ArrayList<>();
+        //这句是为了从服务器中获取历史记录
+        if(tag==2){
+            tag=3;
+        }
         data = op.select("select * from SportPlan a,SportInfo b where a.UserID=? and a.State=? and a.SportID=b.id", new String[]{sp.getID(),tag+""});
         if (data.size() != 0) {
             //查询本地数据库
@@ -125,7 +129,11 @@ public class PlanMe extends AppCompatActivity {
             list.setAdapter(adapterTools);
 
         }else {
-            String cql = "select * from SportPlan where UserID='"+sp.getID()+"' and State='"+tag+"'";
+            //这句是为了从服务器中获取历史记录
+            if(tag==3){
+                tag=2;
+            }
+            String cql = "select * from SportPlan where UserID='"+sp.getID()+"' and State='"+tag+"' order by FinalDate desc";
             AVQuery.doCloudQueryInBackground(cql, new CloudQueryCallback<AVCloudQueryResult>() {
                 @Override
                 public void done(AVCloudQueryResult avCloudQueryResult, AVException e) {
@@ -138,7 +146,7 @@ public class PlanMe extends AppCompatActivity {
                             String plan = "";
 
                             List<Map<String, String>> data = new ArrayList<>();
-                            data = op.select("select * from SportInfo where id=?", new String[]{tag+""});
+                            data = op.select("select * from SportInfo where id=?", new String[]{lists.get(i).get("SportID").toString()});
                             if (data.size() != 0) {
                                 plans.setTitle(data.get(0).get("Name"));
                                 plans.setSummary(data.get(0).get("Summary"));

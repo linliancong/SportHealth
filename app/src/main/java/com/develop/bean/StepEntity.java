@@ -10,6 +10,7 @@ public class StepEntity {
 
     private String curDate; //当天的日期
     private String steps;   //当天的步数
+    private String userID;
 
     public StepEntity() {
     }
@@ -35,6 +36,13 @@ public class StepEntity {
         this.steps = steps;
     }
 
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
 
     @Override
     public String toString() {
@@ -43,4 +51,5 @@ public class StepEntity {
                 ", steps=" + steps +
                 '}';
     }
+
 }

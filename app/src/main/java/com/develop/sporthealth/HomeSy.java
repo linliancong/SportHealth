@@ -163,13 +163,13 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
                 setDatas();
                 setupService();
             }
-            try {
+            /*try {
                 getChartDate();
                 getAxisXLables();
                 initLineChart();
             } catch (ParseException e) {
                 e.printStackTrace();
-            }
+            }*/
 
         }
 
@@ -332,7 +332,7 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
      * 设置记录数据
      */
     private void setDatas() {
-        StepEntity stepEntity = op.getCurDataByDate(curSelDate);
+        StepEntity stepEntity = op.getCurDataByDate(curSelDate,sp.getID());
 
         if (stepEntity != null) {
             int steps = Integer.parseInt(stepEntity.getSteps());

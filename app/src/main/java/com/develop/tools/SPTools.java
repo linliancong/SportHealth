@@ -63,9 +63,20 @@ public class SPTools {
         return sp.getFloat("Weight",0);
     }
 
-    //用户密码
+    //用户体重
     public void setWeight(float Weight){
         editor.putFloat("Weight",Weight);
+        editor.commit();
+    }
+
+    public String getImage()
+    {
+        return sp.getString("Image","");
+    }
+
+    //用户头像URL
+    public void setImage(String Image){
+        editor.putString("Image",Image);
         editor.commit();
     }
 

@@ -30,15 +30,6 @@
             app:textColor="@color/black"
             />
 
-        <Button
-            android:id="@+id/start_share"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/share"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:layout_alignParentRight="true"
-            />
 
         <View
             android:layout_width="match_parent"
@@ -119,13 +110,24 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
             />
+        <Button
+            android:id="@+id/start_share"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/share"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/start_slide"
+            android:visibility="gone"
+            />
         <LinearLayout
             android:id="@+id/start_ly1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_below="@+id/start_slide"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:visibility="visible"
             >
             <LinearLayout

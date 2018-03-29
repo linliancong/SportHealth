@@ -21,6 +21,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,14 +31,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.GetCallback;
+import com.avos.avoscloud.GetDataCallback;
+import com.avos.avoscloud.ProgressCallback;
+import com.avos.avoscloud.SaveCallback;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by Administrator on 2018/3/16.
@@ -95,6 +102,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
 
 
 
+
     Handler handler=new Handler(){
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -126,7 +134,6 @@ public class MeSy extends Fragment implements View.OnClickListener{
 
             init();
 
-            readImage();
             //广播更新
             broad=new MyBroad();
             IntentFilter filter=new IntentFilter();
@@ -355,6 +362,9 @@ public class MeSy extends Fragment implements View.OnClickListener{
      *获取用户信息
      * */
     public void getUserInfo(){
+        if(!readImage()){
+            downLoad();
+        }
         if(!sp.getIsLogin()){
             tx_txt.setText("点我登录~");
             tx2_txt.setText("");
@@ -419,7 +429,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
         if(bd!=null){
             Bitmap photo=bd.getParcelable("data");
             img.setImageBitmap(toOvalBitmap(photo,200));
-            saveImage(toOvalBitmap(photo,200));
+            saveImage(toOvalBitmap(photo,200),true);
 
         }
     }
@@ -427,7 +437,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
     /**
      * 保存图片
      */
-    private void saveImage(Bitmap bitmap) {
+    private void saveImage(Bitmap bitmap,boolean isUP) {
         File filesDir;
         if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){//判断sd卡是否挂载
             //路径1：storage/sdcard/Android/data/包名/files
@@ -441,6 +451,9 @@ public class MeSy extends Fragment implements View.OnClickListener{
             File file = new File(filesDir,sp.getID()+".png");
             fos = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100,fos);
+            if(isUP) {
+                upLoad(file.getAbsolutePath().toString());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }finally{
@@ -502,6 +515,53 @@ public class MeSy extends Fragment implements View.OnClickListener{
             // TODO: handle exception
             return null;
         }
+    }
+
+    /**
+     * 上传图片
+    * */
+    public void upLoad(String path){
+        try {
+            final AVFile file = AVFile.withAbsoluteLocalPath(sp.getID()+".png", path);
+            file.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(AVException e) {
+                    Log.d("MMMM", file.getUrl());//返回一个唯一的 Url 地址
+                    sp.setImage(file.getUrl());
+                    // 第一参数是 className,第二个参数是 objectId
+                    AVObject testObject1 = AVObject.createWithoutData("UserInfo", sp.getID());
+                    testObject1.put("ImageUrl", file.getUrl());
+                    // 保存到云端
+                    testObject1.saveInBackground();
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * 下载图片
+     * */
+    public void downLoad(){
+        final Bitmap[] bitmap = new Bitmap[1];
+        final AVFile file=new AVFile(sp.getID()+".png",sp.getImage(),new HashMap<String, Object>());
+        file.getThumbnailUrl(true, 100, 100);
+        file.getDataInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] bytes, AVException e) {
+                // bytes 就是文件的数据流
+                bitmap[0] = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                saveImage(bitmap[0],false);
+                img.setImageBitmap(bitmap[0]);
+            }
+        }, new ProgressCallback() {
+            @Override
+            public void done(Integer integer) {
+                // 下载进度数据，integer 介于 0 和 100。
+            }
+        });
     }
 
 

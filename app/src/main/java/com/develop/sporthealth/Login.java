@@ -1,5 +1,6 @@
 package com.develop.sporthealth;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -98,7 +99,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
                             //设置登录标记
                             sp.setIsLogin(true);
                             //登录成功通知更新
-                            sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
+                            sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.MeSy$MyBroad")));
+                            sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
                             finish();
                         }else {
                             //登录失败

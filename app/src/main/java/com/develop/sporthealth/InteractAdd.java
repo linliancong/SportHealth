@@ -13,6 +13,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.SaveCallback;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.TimeTools;
@@ -67,7 +70,28 @@ public class InteractAdd extends AppCompatActivity implements View.OnClickListen
         switch (v.getId()){
             case R.id.add_send:
                 time = TimeTools.getCurrentDate2();
-                op.insert("insert into Share(UserID,Title,Content,Date,Count) values(?,?,?,?,0)",new String[]{sp.getID(),"健身心得与知识",content.getText().toString(), time});
+                //这里新增一条数据传到服务器
+                AVObject testObject1 = new AVObject("Share");
+                testObject1.put("UserID",sp.getID());
+                testObject1.put("UserName",sp.getUserName());
+                testObject1.put("Title","健身心得与知识");
+                testObject1.put("Content",content.getText().toString());
+                testObject1.put("Date",time);
+                testObject1.put("Count","0");
+                testObject1.put("ImageUrl",sp.getImage());
+                testObject1.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(AVException e) {
+                        if(e==null){
+                            Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
+                            sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
+                            finish();
+                        }else {
+                            Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                /*op.insert("insert into Share(UserID,Title,Content,Date,Count) values(?,?,?,?,0)",new String[]{sp.getID(),"健身心得与知识",content.getText().toString(), time});
                 //判断是否分享成功
                 List<Map<String, String>> data = new ArrayList<>();
                 data = op.select("select count(*) count from Share where UserID=? and Date=? ",
@@ -78,7 +102,7 @@ public class InteractAdd extends AppCompatActivity implements View.OnClickListen
                     finish();
                 } else {
                     Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
-                }
+                }*/
                 break;
         }
     }

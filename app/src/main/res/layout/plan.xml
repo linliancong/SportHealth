@@ -233,6 +233,7 @@
             android:layout_toLeftOf="@+id/plan_rl2"
             android:background="@mipmap/red"
             android:layout_centerVertical="true"
+            android:visibility="gone"
             />
 
         <View

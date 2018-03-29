@@ -23,13 +23,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.maps.model.Text;
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVFile;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.GetCallback;
+import com.avos.avoscloud.GetDataCallback;
+import com.avos.avoscloud.ProgressCallback;
 import com.develop.bean.ShareMsg;
 import com.develop.tools.AdapterTools;
 import com.develop.tools.SPTools;
+import com.develop.tools.TimeTools;
 import com.develop.tools.database.SQLOperator;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.lang.annotation.ElementType;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +77,14 @@ public class InteractSy extends Fragment {
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
                 case 0x001:
-                    setAdapter();
+                    if(sp.getIsLogin()) {
+                        getDate();
+                        list.setVisibility(View.VISIBLE);
+                    }else {
+                        userimg.setImageResource(R.mipmap.ic_launcher_round);
+                        username.setText("");
+                        list.setVisibility(View.GONE);
+                    }
                     break;
             }
         }
@@ -105,7 +125,9 @@ public class InteractSy extends Fragment {
             }.start();
 
 
-            setAdapter();
+            if(sp.getIsLogin()) {
+                getDate();
+            }
         }
         return view;
     }
@@ -130,13 +152,14 @@ public class InteractSy extends Fragment {
 
     }
 
-    private void setAdapter() {
+    private void getDate() {
         if(readImage(sp.getID())!=null) {
             userimg.setImageBitmap(readImage(sp.getID()));
+        }else {
+            userimg.setImageResource(R.mipmap.ic_launcher_round);
         }
         username.setText(sp.getUserName());
-
-        List<Map<String, String>> data = new ArrayList<>();
+        /*List<Map<String, String>> data = new ArrayList<>();
         data = op.select("select a.id,a.Content,a.Count,a.UserID,b.UserName from Share a,UserInfo b where a.UserID=b.id order by a.id desc", new String[]{});
         if (data.size() != 0) {
             shareMsgs=new ArrayList<>();
@@ -153,8 +176,40 @@ public class InteractSy extends Fragment {
                 }
                 shareMsgs.add(shareMsg);
             }
-        }
+        }*/
+        //从服务器中获取数据
+        AVQuery<AVObject> query = new AVQuery<>("Share");
+        query.orderByDescending("Date");
+        query.findInBackground(new FindCallback<AVObject>() {
+            @Override
+            public void done(List<AVObject> list, AVException e) {
+                if(list.size()>0) {
+                    shareMsgs=new ArrayList<>();
+                    for (int i = 0; i < list.size(); i++) {
+                        shareMsg = new ShareMsg();
+                        shareMsg.setId(list.get(i).getObjectId());
+                        shareMsg.setName(list.get(i).get("UserName").toString());
+                        shareMsg.setContent(list.get(i).get("Content").toString());
+                        shareMsg.setUserID(list.get(i).get("UserID").toString());
+                        shareMsg.setImageUrl(list.get(i).get("ImageUrl").toString());
+                        if (list.get(i).get("Count") != null) {
+                            shareMsg.setNum(list.get(i).get("Count").toString());
+                        } else {
+                            shareMsg.setNum("0");
+                        }
+                        shareMsgs.add(shareMsg);
+                    }
+                    setAdapter();
+                }
 
+            }
+        });
+
+
+
+    }
+
+    private void setAdapter() {
         adapter=new AdapterTools<ShareMsg>(shareMsgs, R.layout.interact_item) {
             @Override
             public void bindView(ViewHolder holder, ShareMsg obj) {
@@ -163,6 +218,8 @@ public class InteractSy extends Fragment {
                 holder.setText(R.id.inte_item_num,obj.getNum());
                 if(readImage(obj.getUserID())!=null) {
                     holder.setImageBitmap(R.id.inte_item_userimg, readImage(obj.getUserID()));
+                }else {
+                    downLoad(obj.getId(),obj.getImageUrl());
                 }
                 holder.setOnClickListener(R.id.inte_item_good);
 
@@ -187,12 +244,17 @@ public class InteractSy extends Fragment {
                 }
                 shareMsgs.get(i).setNum((num+1)+"");
                 adapter.notifyDataSetChanged();
-                op.insert("update Share set Count=? where id=?",new String[]{shareMsgs.get(i).getNum(),shareMsgs.get(i).getId()});
+                //op.insert("update Share set Count=? where id=?",new String[]{shareMsgs.get(i).getNum(),shareMsgs.get(i).getId()});
+
+                // 第一参数是 className,第二个参数是 objectId
+                AVObject testObject1 = AVObject.createWithoutData("Share", shareMsgs.get(i).getId());
+                testObject1.put("Count", shareMsgs.get(i).getNum());
+                // 保存到云端
+                testObject1.saveInBackground();
+
                 //Toast.makeText(context,"你点击了~"+i,Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
 
     /**
@@ -234,6 +296,60 @@ public class InteractSy extends Fragment {
         super.onDestroy();
         if(broad!=null){
             getActivity().unregisterReceiver(broad);
+        }
+    }
+
+    /**
+     * 下载图片
+     * */
+    public void downLoad(final String name, String url){
+        final Bitmap[] bitmap = new Bitmap[1];
+        final AVFile file=new AVFile(name+".png",url,new HashMap<String, Object>());
+        file.getThumbnailUrl(true, 100, 100);
+        file.getDataInBackground(new GetDataCallback() {
+            @Override
+            public void done(byte[] bytes, AVException e) {
+                // bytes 就是文件的数据流
+                bitmap[0] = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                saveImage(bitmap[0],name);
+                //img.setImageBitmap(bitmap[0]);
+            }
+        }, new ProgressCallback() {
+            @Override
+            public void done(Integer integer) {
+                // 下载进度数据，integer 介于 0 和 100。
+            }
+        });
+    }
+
+    /**
+     * 保存图片
+     */
+    private void saveImage(Bitmap bitmap,String name) {
+        File filesDir;
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){//判断sd卡是否挂载
+            //路径1：storage/sdcard/Android/data/包名/files
+            filesDir = context.getExternalFilesDir("");
+        }else{//手机内部存储
+            //路径2：data/data/包名/files
+            filesDir = context.getFilesDir();
+        }
+        FileOutputStream fos = null;
+        try {
+            File file = new File(filesDir,name+".png");
+            fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100,fos);
+            adapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally{
+            if(fos != null){
+                try {
+                    fos.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

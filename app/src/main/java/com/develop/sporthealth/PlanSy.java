@@ -1,9 +1,7 @@
 package com.develop.sporthealth;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.content.Context;
@@ -14,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -25,10 +22,8 @@ import com.develop.tools.SPTools;
 import com.develop.tools.TimeTools;
 import com.develop.tools.database.SQLOperator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Administrator on 2018/3/16.
@@ -48,6 +43,8 @@ public class PlanSy extends Fragment implements View.OnClickListener{
     private RelativeLayout remind;
     private TextView remind_v;
 
+    private ShowBack showBack;
+
     Handler handler=new Handler(){
         @Override
         public void handleMessage(android.os.Message msg) {
@@ -59,7 +56,7 @@ public class PlanSy extends Fragment implements View.OnClickListener{
                     AVQuery<AVObject> query2 = new AVQuery<>("Messages");
                     query2.whereEqualTo("UserID",sp.getID());
                     AVQuery<AVObject> query3 = new AVQuery<>("Messages");
-                    query2.whereEqualTo("State","1");
+                    query3.whereEqualTo("State","1");
                     AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2,query3));
                     query.findInBackground(new FindCallback<AVObject>() {
                            @Override
@@ -72,12 +69,22 @@ public class PlanSy extends Fragment implements View.OnClickListener{
                                    testObject1.saveInBackground();
 
                                    getVisible();
+                                   showBack= (ShowBack) getActivity();
+                                   showBack.callBack(0x001);
+
+
                                }
 
                            }
                        });
-
-
+                    break;
+                case 0x002:
+                    showBack= (ShowBack) getActivity();
+                    showBack.callBack(0x002);
+                    break;
+                case 0x003:
+                    showBack= (ShowBack) getActivity();
+                    showBack.callBack(0x001);
                     break;
             }
         }
@@ -97,41 +104,39 @@ public class PlanSy extends Fragment implements View.OnClickListener{
             view = inflater.inflate(R.layout.plan, container, false);
 
             init();
-
-
-            //判断是否有计划，没有的话从服务器同步
-            List<Map<String, String>> data = new ArrayList<>();
-            data = op.select("select count(*) num from SportPlan where UserID=? and SportID=1 ", new String[]{sp.getID()});
-            if (data.get(0).get("num").equals("0")) {
-                AVQuery<AVObject> query1 = new AVQuery<>("SportPlan");
-                query1.whereEqualTo("UserID", sp.getID());
-                AVQuery<AVObject> query2 = new AVQuery<>("SportPlan");
-                query2.whereEqualTo("State", "1");
-                AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
-                query.findInBackground(new FindCallback<AVObject>() {
-                    @Override
-                    public void done(List<AVObject> list, AVException e) {
-                        if (list.size() > 0) {
-                            for (int i = 0; i < list.size(); i++) {
-                                op.insert("insert into SportPlan(UserID,SportID,State,StartDate,Target) values(?,?,?,?,?)", new String[]{sp.getID(),
-                                        list.get(i).get("SportID").toString(), list.get(i).get("State").toString(),
-                                        list.get(i).get("StartDate").toString(), list.get(i).get("Target").toString()});
-                            }
-
-                        }
-                    }
-                });
-            }
-
-
-            getVisible();
-
+        }
+        if(sp.getIsLogin()) {
+            getData();
         }
         return view;
     }
 
+    private void getData() {
+        //每次都从服务器把最新的计划同步下来
+        op.insert("delete from SportPlan where UserID=? and State=1 ", new String[]{sp.getID()});
+        AVQuery<AVObject> query1 = new AVQuery<>("SportPlan");
+        query1.whereEqualTo("UserID", sp.getID());
+        AVQuery<AVObject> query2 = new AVQuery<>("SportPlan");
+        query2.whereEqualTo("State", "1");
+        AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+        query.findInBackground(new FindCallback<AVObject>() {
+            @Override
+            public void done(List<AVObject> list, AVException e) {
+                if (list.size() > 0) {
+                    for (int i = 0; i < list.size(); i++) {
+                        op.insert("insert into SportPlan(UserID,SportID,State,StartDate,Target) values(?,?,?,?,?)", new String[]{sp.getID(),
+                                list.get(i).get("SportID").toString(), list.get(i).get("State").toString(),
+                                list.get(i).get("StartDate").toString(), list.get(i).get("Target").toString()});
+                                getVisible();
+                    }
+
+                }
+            }
+        });
+    }
+
     private void getVisible() {
-        //先判断有没有数据，没有的话加入
+        //先判断有没有数据，没有的话加入;有的话判断是否已读
         AVQuery<AVObject> query1 = new AVQuery<>("Messages");
         query1.whereEqualTo("UserID",sp.getID());
         AVQuery<AVObject> query2 = new AVQuery<>("Messages");
@@ -149,9 +154,24 @@ public class PlanSy extends Fragment implements View.OnClickListener{
                     testObject1.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(AVException e) {
+                            if(e==null){
+                                remind_v.setVisibility(View.VISIBLE);
+                                handler.sendEmptyMessage(0x002);
+                            }else {
+                                remind_v.setVisibility(View.GONE);
+                                handler.sendEmptyMessage(0x003);
+                            }
                         }
                     });
 
+                }else{
+                    if(list.get(0).get("State").equals("1")){
+                        remind_v.setVisibility(View.VISIBLE);
+                        handler.sendEmptyMessage(0x002);
+                    }else {
+                        remind_v.setVisibility(View.GONE);
+                        handler.sendEmptyMessage(0x003);
+                    }
                 }
             }
         });
@@ -164,12 +184,12 @@ public class PlanSy extends Fragment implements View.OnClickListener{
         }*/
 
         //判断今天的消息是否未读
-        query1 = new AVQuery<>("Messages");
+        /*query1 = new AVQuery<>("Messages");
         query1.whereEqualTo("Date",TimeTools.getCurrentDate());
         query2 = new AVQuery<>("Messages");
         query2.whereEqualTo("UserID",sp.getID());
         AVQuery<AVObject> query3 = new AVQuery<>("Messages");
-        query2.whereEqualTo("State","1");
+        query3.whereEqualTo("State","1");
         query = AVQuery.and(Arrays.asList(query1, query2,query3));
         query.findInBackground(new FindCallback<AVObject>() {
             @Override
@@ -180,7 +200,7 @@ public class PlanSy extends Fragment implements View.OnClickListener{
                     remind_v.setVisibility(View.GONE);
                 }
             }
-        });
+        });*/
             /*data = op.select("select count(1) num from Messages where UserID=? and State=1 and Date=?", new String[]{sp.getID(), TimeTools.getCurrentDate()});
         if (data.size() != 0) {
             if(data.get(0).get("num").equals("1")){
@@ -236,6 +256,10 @@ public class PlanSy extends Fragment implements View.OnClickListener{
                 startActivity(intent5);
                 break;
         }
+    }
+
+    public interface ShowBack {
+        public void callBack(int result);
     }
 
 }

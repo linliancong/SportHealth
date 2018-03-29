@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,6 +43,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.CloudQueryCallback;
+import com.avos.avoscloud.DeleteCallback;
 import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.develop.tools.MyLayout;
@@ -148,6 +150,8 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
     private int H=0;
     private int M=0;
     private int S=0;
+
+    private String rspeed = "0";
 
 
     private PowerManager.WakeLock wakeLock;
@@ -345,7 +349,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 aMapLocation.getLongitude();
                 //获取精度信息
                 aMapLocation.getAccuracy();
-                Date date=new Date(aMapLocation.getTime());
+                Date date=new Date();
                 //定位的时间
                 df.format(date);
 
@@ -409,6 +413,20 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     op.insert("insert into SportLocation(UserID,RunID,Longitude,Latitude,Time,Speed) values(?,?,?,?,?,?)",
                             new String[]{sp.getID(), RunID, aMapLocation.getLongitude() + "", aMapLocation.getLatitude() + "", df.format(date), tspeed + ""});
 
+                    //这里新增一条数据传到服务器
+                   /* AVObject testObject1 = new AVObject("SportLocation");
+                    testObject1.put("UserID",sp.getID());
+                    testObject1.put("RunID",RunID);
+                    testObject1.put("Longitude",aMapLocation.getLongitude()+"");
+                    testObject1.put("Latitude",aMapLocation.getLatitude() + "");
+                    testObject1.put("Time",df.format(date));
+                    testObject1.put("Speed",tspeed + "");
+                    testObject1.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(AVException e) {
+                        }
+                    });*/
+
                     handler.sendEmptyMessage(0x001);
 
                 }
@@ -451,7 +469,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
             case R.id.start_btn:
                 //点击开始跳转
                 initData();
-                if(isFinish) {
+                /*if(isFinish) {
                     acquireWakeLock();
                     visible.setVisibility(View.GONE);
                     visible2.setVisibility(View.VISIBLE);
@@ -462,7 +480,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     polylineOptions=new PolylineOptions();
                     markerOptions=new MarkerOptions();
                     markers=new ArrayList<>();
-                }
+                }*/
                 // 测试 SDK 是否正常工作的代码
                 /*AVObject testObject = new AVObject("TestObject1111");
                 testObject.put("words","Hello World!");
@@ -511,7 +529,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 pause.setVisibility(View.GONE);
                 stop.setVisibility(View.VISIBLE);
                 play.setVisibility(View.VISIBLE);
-                title.setVisibility(View.VISIBLE);
+                share.setVisibility(View.VISIBLE);
                 break;
             case R.id.start_play:
                 //继续
@@ -520,12 +538,12 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 pause.setVisibility(View.VISIBLE);
                 stop.setVisibility(View.GONE);
                 play.setVisibility(View.GONE);
-                title.setVisibility(View.GONE);
+                share.setVisibility(View.GONE);
                 break;
             case R.id.start_share:
                 //分享
                 //判断是否达标，达标则将数据计入完成表中
-                if(SportID.equals("2") && distance>=5 || SportID.equals("3") && distance>=10 || SportID.equals("4") && distance>=21.0975 || SportID.equals("5") && distance>=42.195)
+                //if(SportID.equals("2") && distance>=5 || SportID.equals("3") && distance>=10 || SportID.equals("4") && distance>=21.0975 || SportID.equals("5") && distance>=42.195)
                 {
                     String title = "";
                     String content = "";
@@ -544,50 +562,41 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     }
                     content = "我在" + TimeTools.getCurrentDate() + "完成了" + title + "任务！";
 
-                    op.insert("insert into Share(UserID,Title,Content,Date,Count) values(?,?,?,?,0)",
-                            new String[]{sp.getID(), title, content, time});
-                    //判断是否分享成功
-                    List<Map<String, String>> data = new ArrayList<>();
-                    data = op.select("select count(*) count from Share where UserID=? and Date=? ",
-                            new String[]{sp.getID(), time});
-                    if (data.get(0).get("count").equals("1")) {
-                        //Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
-                        //sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
-                    } else {
-                        //Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
-                    }
-
+                    //op.insert("insert into Share(UserID,Title,Content,Date,Count) values(?,?,?,?,0)",new String[]{sp.getID(), title, content, time});
+                    //这里新增一条数据传到服务器
                     AVObject testObject1 = new AVObject("Share");
                     testObject1.put("UserID",sp.getID());
+                    testObject1.put("UserName",sp.getUserName());
                     testObject1.put("Title",title);
                     testObject1.put("Content",content);
                     testObject1.put("Date",time);
-                    testObject1.put("Count",0);
+                    testObject1.put("Count","0");
+                    testObject1.put("ImageUrl",sp.getImage());
                     testObject1.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(AVException e) {
-                            if(e == null){
+                            if(e==null){
                                 Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
                                 sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
-                            }else{
+                            }else {
                                 Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                 }
-                else{
+                /*else{
                     Toast.makeText(context, "运动未达标！请先完成运动再来分享呦~", Toast.LENGTH_SHORT).show();
-                }
+                }*/
                 break;
         }
     }
 
     private void update() {
         //如果运动超过三分钟则更新运动表，否则删除该记录，并且删除轨迹记录。
-        //if (totalTime > 180)
+        if (totalTime > 180)
         {
             endTime = df.format(new Date());
-            String rspeed = "0";
+
             List<Map<String, String>> data = new ArrayList<>();
             data = op.select("select sum(Speed) speed,count(*) count from SportLocation where UserID=? and RunID=? ",
                     new String[]{sp.getID(), RunID});
@@ -597,79 +606,127 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     double count = new Double(data.get(0).get("count"));
                     rspeed = db2.format(speed / count);
                 }
-            }else {
-                /*String cql = "select sum(Speed) speed,count(*) count from SportLocation where UserID=? and RunID=?";
-                AVQuery.doCloudQueryInBackground(cql, new CloudQueryCallback<AVCloudQueryResult>() {
-                    @Override
-                    public void done(AVCloudQueryResult avCloudQueryResult, AVException e) {
-                        if (e == null) {
-                            // 操作成功
-                            ArrayList<AVObject> list= (ArrayList<AVObject>) avCloudQueryResult.getResults();
-                        } else {
-                            e.printStackTrace();
-                        }
-                    }
-                }, Arrays.asList(0, 1));*/
             }
-            op.insert("update SportRunning set EndTime=?,Speed=?,Total=?,Time=?,Hot=? where StartTime=?",
-                    new String[]{endTime, rspeed, db.format(distance) + "", totalTime + "", db.format(totalHot) + "", startTime});
-
-            String cql = "update SportRunning set EndTime=?,Speed=?,Total=?,Time=?,Hot=? where StartTime=?";
-            AVQuery.doCloudQueryInBackground(cql, new CloudQueryCallback<AVCloudQueryResult>() {
+            /*op.insert("update SportRunning set EndTime=?,Speed=?,Total=?,Time=?,Hot=? where StartTime=?",
+                    new String[]{endTime, rspeed, db.format(distance) + "", totalTime + "", db.format(totalHot) + "", startTime});*/
+            //这里更新数据传到服务器
+            AVQuery<AVObject> query1 = new AVQuery<>("SportRunning");
+            query1.whereEqualTo("UserID",sp.getID());
+            AVQuery<AVObject> query2 = new AVQuery<>("SportRunning");
+            query2.whereEqualTo("StartTime",startTime);
+            AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+            query.findInBackground(new FindCallback<AVObject>() {
                 @Override
-                public void done(AVCloudQueryResult avCloudQueryResult, AVException e) {
+                public void done(List<AVObject> list, AVException e) {
+                    if(list.size()>0){
+                        // 第一参数是 className,第二个参数是 objectId
+                        AVObject testObject1 = AVObject.createWithoutData("SportRunning", list.get(0).getObjectId());
+
+                        testObject1.put("EndTime",endTime);
+                        testObject1.put("Speed",rspeed);
+                        testObject1.put("Total",db.format(distance) + "");
+                        testObject1.put("Time",totalTime+"");
+                        testObject1.put("Hot",db.format(totalHot) + "");
+
+                        // 保存到云端
+                        testObject1.saveInBackground();
+                    }
+                }
+            });
+
+            //保存位置信息到服务器
+            ArrayList<AVObject> todos = new ArrayList<>();
+            data = op.select("select * from SportLocation where UserID=? and RunID=?",
+                    new String[]{sp.getID(), RunID});
+            if (data.size() != 0) {
+                for(int i=0;i<data.size();i++){
+                    AVObject todo=new AVObject("SportLocation");
+                    todo.put("UserID",sp.getID());
+                    todo.put("RunID",RunID);
+                    todo.put("Longitude",data.get(i).get("Longitude"));
+                    todo.put("Latitude",data.get(i).get("Latitude"));
+                    todo.put("Time",data.get(i).get("Time"));
+                    todo.put("Speed",data.get(i).get("Speed"));
+                    todos.add(todo);
+                }
+            }
+
+            AVObject.saveAllInBackground(todos, new SaveCallback() {
+                @Override
+                public void done(AVException e) {
                     if (e == null) {
-                        // 操作成功
+                        // 保存成功
                     } else {
                         e.printStackTrace();
                     }
                 }
-            }, Arrays.asList(endTime, rspeed,db.format(distance)),totalTime,db.format(totalHot),startTime);
+            });
+
+
             //判断是否达标，达标则将数据计入完成表中
             if(SportID.equals("2") && distance>=5 || SportID.equals("3") && distance>=10 || SportID.equals("4") && distance>=21.0975 || SportID.equals("5") && distance>=42.195){
                 op.insert("insert into SportFinish(UserID,SportID,Time) values(?,?,?)", new String[]{sp.getID(), SportID,TimeTools.getCurrentDate()});
+                //这里新增一条数据传到服务器
+                AVObject testObject1 = new AVObject("SportFinish");
+                testObject1.put("UserID",sp.getID());
+                testObject1.put("SportID",SportID);
+                testObject1.put("Time",TimeTools.getCurrentDate());
 
-                String cql1 = "insert into SportFinish(UserID,SportID,Time) values(?,?,?)";
-                AVQuery.doCloudQueryInBackground(cql1, new CloudQueryCallback<AVCloudQueryResult>() {
+                testObject1.saveInBackground(new SaveCallback() {
                     @Override
-                    public void done(AVCloudQueryResult avCloudQueryResult, AVException e) {
-                        if (e == null) {
-                            // 操作成功
-                        } else {
-                            e.printStackTrace();
-                        }
+                    public void done(AVException e) {
                     }
-                }, Arrays.asList(sp.getID(), SportID,TimeTools.getCurrentDate()));
+                });
             }
             sendBroadcast(new Intent("com.develop.sport.MYBROAD3").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.HomeSy$MyBroad")));
         }
-        //else
+        else
             {
-            op.insert("delete from SportRunning where id=?",new String[]{RunID});
+            //op.insert("delete from SportRunning where id=?",new String[]{RunID});
             op.insert("delete from SportLocation where RunID=?",new String[]{RunID});
 
-            String cql2 = "delete from SportRunning where id=?";
-            AVQuery.doCloudQueryInBackground(cql2, new CloudQueryCallback<AVCloudQueryResult>() {
+            //这里删除一些数据
+            /*AVQuery<AVObject> query = new AVQuery<>("SportLocation");
+            query.findInBackground(new FindCallback<AVObject>() {
                 @Override
-                public void done(AVCloudQueryResult avCloudQueryResult, AVException e) {
-                    if (e == null) {
-                        // 操作成功
-                    } else {
-                        e.printStackTrace();
+                public void done(List<AVObject> list, AVException e) {
+                    List<AVObject> todos = (List<AVObject>) list;
+                    for (AVObject todo : list) {
+                        todo.put("RunID", RunID);
+                    }
+
+                    AVObject.deleteAllInBackground(todos, new DeleteCallback() {
+                        @Override
+                        public void done(AVException e) {
+                            if (e == null) {
+                                // 保存成功
+                            } else {
+                                //出现错误
+                            }
+                        }
+                    });
+                }
+            });*/
+
+            //这里删除一个数据
+            AVQuery<AVObject> query1 = new AVQuery<>("SportRunning");
+            query1.whereEqualTo("UserID",sp.getID());
+            AVQuery<AVObject> query2 = new AVQuery<>("SportRunning");
+            query2.whereEqualTo("StartTime",startTime);
+            AVQuery<AVObject> query3 = AVQuery.and(Arrays.asList(query1, query2));
+            query3.findInBackground(new FindCallback<AVObject>() {
+                @Override
+                public void done(List<AVObject> list, AVException e) {
+                    if(list.size()>0){
+                        // 第一参数是 className,第二个参数是 objectId
+                        AVObject testObject1 = AVObject.createWithoutData("SportRunning", list.get(0).getObjectId());
+
+                        // 保存到云端
+                        testObject1.deleteInBackground();
                     }
                 }
-            }, Arrays.asList(RunID));
-            String cql3 = "delete from SportLocation where RunID=?";
-            AVQuery.doCloudQueryInBackground(cql3, new CloudQueryCallback<AVCloudQueryResult>() {
-                @Override
-                public void done(AVCloudQueryResult avCloudQueryResult, AVException e) {
-                    if (e == null) {
-                        // 操作成功
-                    } else {
-                        e.printStackTrace();
-                    }
-                }
-            }, Arrays.asList(RunID));
+            });
+
         }
     }
 
@@ -684,26 +741,50 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
             SportID=data.get(0).get("SportID");
             op.select("insert into SportRunning(UserID,SportID,StartTime) values(?,?,?)", new String[]{sp.getID(),SportID,startTime});
 
-            String cql3 = "insert into SportRunning(UserID,SportID,StartTime) values(?,?,?)";
-            AVQuery.doCloudQueryInBackground(cql3, new CloudQueryCallback<AVCloudQueryResult>() {
+            //这里新增一条数据传到服务器
+            AVObject testObject1 = new AVObject("SportRunning");
+            testObject1.put("UserID",sp.getID());
+            testObject1.put("SportID",SportID);
+            testObject1.put("StartTime",startTime);
+            testObject1.saveInBackground(new SaveCallback() {
                 @Override
-                public void done(AVCloudQueryResult avCloudQueryResult, AVException e) {
-                    if (e == null) {
-                        // 操作成功
-                    } else {
-                        e.printStackTrace();
-                    }
-                }
-            }, Arrays.asList(sp.getID(),SportID,startTime));
+                public void done(AVException e) {
+                    String cql = "select * from SportRunning where UserID='"+sp.getID()+"' and SportID='"+SportID+"' and StartTime='"+startTime+"'";
+                    AVQuery.doCloudQueryInBackground(cql, new CloudQueryCallback<AVCloudQueryResult>() {
+                        @Override
+                        public void done(AVCloudQueryResult avCloudQueryResult, AVException e) {
+                            if (e == null) {
+                                isFinish=true;
+                                RunID=avCloudQueryResult.getResults().get(0).getObjectId();
 
-            data = op.select("select * from SportRunning where UserID=? and SportID=? and StartTime=?", new String[]{sp.getID(),SportID,startTime});
+                                acquireWakeLock();
+                                visible.setVisibility(View.GONE);
+                                visible2.setVisibility(View.VISIBLE);
+                                title.setVisibility(View.GONE);
+                                isStart=true;
+                                isFirst=false;
+                                //开始运动时地图轨迹、标记初始化
+                                polylineOptions=new PolylineOptions();
+                                markerOptions=new MarkerOptions();
+                                markers=new ArrayList<>();
+
+                            }else {
+                                isFinish=false;
+                                Toast.makeText(context,"初始化失败，请重试",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            });
+
+            /*data = op.select("select * from SportRunning where UserID=? and SportID=? and StartTime=?", new String[]{sp.getID(),SportID,startTime});
             if (data.size() != 0) {
                 isFinish=true;
                 RunID=data.get(0).get("id");
             }else{
                 isFinish=false;
                 Toast.makeText(context,"初始化失败，请重试",Toast.LENGTH_SHORT).show();
-            }
+            }*/
         }else {
             Toast.makeText(context,"你还没有运动计划，请先创建计划",Toast.LENGTH_SHORT).show();
         }

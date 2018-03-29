@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.develop.bean.StepEntity;
 import com.develop.tools.AppManager;
@@ -22,12 +24,15 @@ import com.develop.tools.SPTools;
 import com.develop.tools.TimeTools;
 import com.develop.tools.database.SQLOperator;
 
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * Created by Administrator on 2017/3/16.
  */
 
-public class MainActivity extends CheckPermissionsTools implements RadioGroup.OnCheckedChangeListener,ViewPager.OnPageChangeListener{
+public class MainActivity extends CheckPermissionsTools implements RadioGroup.OnCheckedChangeListener,ViewPager.OnPageChangeListener,PlanSy.ShowBack{
 
     public static final int PAG_ONE=0;
     public static final int PAG_TWO=1;
@@ -39,6 +44,7 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
     private RadioButton rb_plan;
     private RadioButton rb_interact;
     private RadioButton rb_me;
+    private TextView rb_remind_v;
 
 
     private View view_home;
@@ -169,6 +175,7 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
         bindView();
         rb_home.setChecked(true);
 
+
         //这里是测试数据
         /*op.insert("insert into SportFinish(UserID,SportID,Time) values(?,?,?)",new String[]{sp.getID(),"1", TimeTools.getCurrentDate()});
         op.insert("insert into SportFinish(UserID,SportID,Time) values(?,?,?)",new String[]{sp.getID(),"5", TimeTools.getCurrentDate()});
@@ -197,6 +204,7 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
         rb_plan = findViewById(R.id.rb_plan);
         rb_interact = findViewById(R.id.rb_interact);
         rb_me= findViewById(R.id.rb_me);
+        rb_remind_v=findViewById(R.id.rb_remind_v);
 
         //viewPager相关的设置
         vpager= findViewById(R.id.vpager);
@@ -311,6 +319,18 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
     }
 
 
+
+    @Override
+    public void callBack(int result) {
+        switch (result){
+            case 0x001:
+                rb_remind_v.setVisibility(View.GONE);
+                break;
+            case 0x002:
+                rb_remind_v.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
 }
 
 

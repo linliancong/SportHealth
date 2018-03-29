@@ -133,7 +133,7 @@ public class PlanRunningNumber extends AppCompatActivity implements View.OnClick
             AVQuery<AVObject> query2 = new AVQuery<>("SportPlan");
             query2.whereNotEqualTo("SportID","1");
             AVQuery<AVObject> query3 = new AVQuery<>("SportPlan");
-            query2.whereEqualTo("State","1");
+            query3.whereEqualTo("State","1");
             AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2,query3));
             query.findInBackground(new FindCallback<AVObject>() {
                 @Override
@@ -200,7 +200,7 @@ public class PlanRunningNumber extends AppCompatActivity implements View.OnClick
             AVQuery<AVObject> query2 = new AVQuery<>("SportPlan");
             query2.whereNotEqualTo("SportID","1");
             AVQuery<AVObject> query3 = new AVQuery<>("SportPlan");
-            query2.whereEqualTo("State","1");
+            query3.whereEqualTo("State","1");
             AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2,query3));
             query.findInBackground(new FindCallback<AVObject>() {
                 @Override
@@ -210,6 +210,7 @@ public class PlanRunningNumber extends AppCompatActivity implements View.OnClick
                         for (int i=0;i<list.size();i++) {
                             AVObject testObject1 = AVObject.createWithoutData("SportPlan", list.get(i).getObjectId());
                             testObject1.put("State", "2");
+                            testObject1.put("FinalDate", TimeTools.getCurrentDate());
                             // 保存到云端
                             testObject1.saveInBackground();
                         }
