@@ -219,7 +219,7 @@ public class InteractSy extends Fragment {
                 if(readImage(obj.getUserID())!=null) {
                     holder.setImageBitmap(R.id.inte_item_userimg, readImage(obj.getUserID()));
                 }else {
-                    downLoad(obj.getId(),obj.getImageUrl());
+                    downLoad(obj.getUserID(),obj.getImageUrl());
                 }
                 holder.setOnClickListener(R.id.inte_item_good);
 
@@ -310,8 +310,10 @@ public class InteractSy extends Fragment {
             @Override
             public void done(byte[] bytes, AVException e) {
                 // bytes 就是文件的数据流
-                bitmap[0] = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                saveImage(bitmap[0],name);
+                if(bytes!=null) {
+                    bitmap[0] = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    saveImage(bitmap[0], name);
+                }
                 //img.setImageBitmap(bitmap[0]);
             }
         }, new ProgressCallback() {

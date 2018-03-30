@@ -22,6 +22,11 @@ import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
+import com.develop.bean.Running;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
@@ -64,7 +69,7 @@ public class HomeRunningShow extends AppCompatActivity{
 
         getData();
 
-        showMap();
+        //showMap();
 
     }
 
@@ -100,13 +105,33 @@ public class HomeRunningShow extends AppCompatActivity{
 
     private void getData() {
         RunID=getIntent().getStringExtra("RunID");
-        List<Map<String, String>> data = new ArrayList<>();
+        //显示统计数据
+        AVQuery<AVObject> query = new AVQuery<>("SportLocation");
+        query.whereEqualTo("RunID",RunID);
+        query.orderByAscending("Time");
+        query.findInBackground(new FindCallback<AVObject>() {
+            @Override
+            public void done(List<AVObject> list, AVException e) {
+                if (list.size() > 0) {
+                    String date1 = "";
+                    String date2 = "";
+                    int i = 0;
+                    double total = 0;
+                    for (; i < list.size(); i++) {
+                        latLngs.add(new LatLng(new Double(list.get(i).get("Latitude").toString()), new Double(list.get(i).get("Longitude").toString())));
+                    }
+                    showMap();
+                }
+            }
+        });
+
+        /*List<Map<String, String>> data = new ArrayList<>();
         data = op.select("select * from SportLocation where RunID=? order by Time asc", new String[]{RunID});
         if (data.size() != 0) {
             for (int i=0;i<data.size();i++) {
                 latLngs.add(new LatLng(new Double(data.get(i).get("Latitude")), new Double(data.get(i).get("Longitude"))));
             }
-        }
+        }*/
     }
 
     private void showMap() {

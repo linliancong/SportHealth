@@ -3,6 +3,7 @@ package com.develop.sporthealth;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +40,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
     private Button login;
     private Button cancel;
     private Button register;
+    private Button find;
 
     private Context context;
     private SQLOperator op;
@@ -60,6 +62,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
         login=findViewById(R.id.login);
         cancel=findViewById(R.id.login_cancel);
         register=findViewById(R.id.register);
+        find=findViewById(R.id.find);
 
         //文本变化的监听
         user.addTextChangedListener(this);
@@ -69,6 +72,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
         login.setOnClickListener(this);
         cancel.setOnClickListener(this);
         register.setOnClickListener(this);
+        find.setOnClickListener(this);
 
         user.setText(sp.getUserName());
         pwd.setText(sp.getPWD());
@@ -92,15 +96,24 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
                             sp.setUserName(list.get(0).get("UserName").toString());
                             sp.setPWD(list.get(0).get("Password").toString());
                             sp.setName(list.get(0).get("Name").toString());
-                            String str=list.get(0).get("Weight").toString();
+                            if(list.get(0).get("ImageUrl")!=null) {
+                                sp.setImage(list.get(0).get("ImageUrl").toString());
+                            }
+                            //String str=list.get(0).get("Weight").toString();
                             if (!list.get(0).get("Weight").toString().equals("")) {
                                 sp.setWeight(new Float(list.get(0).get("Weight").toString()).floatValue());
                             }
                             //设置登录标记
                             sp.setIsLogin(true);
                             //登录成功通知更新
-                            sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.MeSy$MyBroad")));
-                            sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
+                            if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
+                                sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
+                                sendBroadcast(new Intent("com.develop.sport.MYBROAD2"));
+                            }
+                            else {
+                                sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.MeSy$MyBroad")));
+                                sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
+                            }
                             finish();
                         }else {
                             //登录失败
@@ -117,6 +130,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
                 //注册
                 Intent it3=new Intent(context,Register.class);
                 startActivity(it3);
+                break;
+            case R.id.find:
+                //找回密码
+                Intent it4=new Intent(context,ResetPWD.class);
+                startActivity(it4);
                 break;
         }
     }

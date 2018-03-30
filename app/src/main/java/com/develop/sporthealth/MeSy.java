@@ -362,9 +362,6 @@ public class MeSy extends Fragment implements View.OnClickListener{
      *获取用户信息
      * */
     public void getUserInfo(){
-        if(!readImage()){
-            downLoad();
-        }
         if(!sp.getIsLogin()){
             tx_txt.setText("点我登录~");
             tx2_txt.setText("");
@@ -377,6 +374,9 @@ public class MeSy extends Fragment implements View.OnClickListener{
             qq_txt.setText("");
             img.setImageResource(R.mipmap.ic_launcher_round);
         }else {
+            if(!readImage()){
+                downLoad();
+            }
             AVQuery<AVObject> avQuery = new AVQuery<>("UserInfo");
             avQuery.getInBackground(sp.getID(), new GetCallback<AVObject>() {
                 @Override
@@ -552,9 +552,11 @@ public class MeSy extends Fragment implements View.OnClickListener{
             @Override
             public void done(byte[] bytes, AVException e) {
                 // bytes 就是文件的数据流
-                bitmap[0] = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                saveImage(bitmap[0],false);
-                img.setImageBitmap(bitmap[0]);
+                if(bytes!=null) {
+                    bitmap[0] = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    saveImage(bitmap[0], false);
+                    img.setImageBitmap(bitmap[0]);
+                }
             }
         }, new ProgressCallback() {
             @Override

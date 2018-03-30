@@ -9,14 +9,21 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
 import com.develop.bean.Running;
 import com.develop.tools.AdapterTools;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
+import com.develop.tools.TimeTools;
 import com.develop.tools.database.SQLOperator;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -63,42 +70,51 @@ public class HomeRunning extends AppCompatActivity {
     }
 
     private void getData() {
-        int speed=0;
-        int time=0;
-        int S=0;
-        int M=0;
-        int H=0;
-        int HMS=0;
-        List<Map<String, String>> data = new ArrayList<>();
-        data = op.select("select * from SportRunning where UserID=? order by StartTime desc", new String[]{sp.getID()});
-        if (data.size() != 0) {
-            for (int i=0;i<data.size();i++) {
-                running=new Running();
-                running.setRunID(data.get(i).get("id"));
-                running.setStartTime(data.get(i).get("StartTime"));
-                running.setEndTime(data.get(i).get("EndTime"));
-                running.setHot(data.get(i).get("Hot"));
-                running.setTotal(data.get(i).get("Total"));
-                if(data.get(i).get("Speed")!=null){
-                    speed=new Integer(data.get(i).get("Speed"));
-                    S=speed%60;
-                    M=speed/60;
-                    running.setSpeed(M + "'" + S + "''");
-                }else{
-                    running.setSpeed("--");
+        final int[] speed = {0};
+        final int[] time = {0};
+        final int[] S = {0};
+        final int[] M = {0};
+        final int[] H = {0};
+        final int[] HMS = {0};
+        //显示统计数据
+        AVQuery<AVObject> query = new AVQuery<>("SportRunning");
+        query.whereEqualTo("UserID",sp.getID());
+        query.orderByDescending("StartTime");
+        query.findInBackground(new FindCallback<AVObject>() {
+            @Override
+            public void done(List<AVObject> list, AVException e) {
+                if (list.size() > 0) {
+                    String date1 = "";
+                    String date2 = "";
+                    int i = 0;
+                    double total = 0;
+                    for (; i < list.size(); i++) {
+                        running = new Running();
+                        running.setRunID(list.get(i).getObjectId());
+                        running.setStartTime(list.get(i).get("StartTime").toString());
+                        running.setEndTime(list.get(i).get("EndTime").toString());
+                        running.setHot(list.get(i).get("Hot").toString());
+                        running.setTotal(list.get(i).get("Total").toString());
+                        if (list.get(i).get("Speed") != null) {
+                            speed[0] = new Integer(list.get(i).get("Speed").toString());
+                            S[0] = speed[0] % 60;
+                            M[0] = speed[0] / 60;
+                            running.setSpeed(M[0] + "'" + S[0] + "''");
+                        } else {
+                            running.setSpeed("--");
+                        }
+                        time[0] = new Integer(list.get(i).get("Time").toString());
+                        S[0] = time[0] % 60;
+                        HMS[0] = time[0] / 60;
+                        M[0] = HMS[0] % 60;
+                        H[0] = HMS[0] / 60;
+                        running.setTime((H[0] >= 10 ? (H[0] + "") : ("0" + H[0])) + ":" + (M[0] >= 10 ? (M[0] + "") : ("0" + M[0])) + ":" + (S[0] >= 10 ? (S[0] + "") : ("0" + S[0])));
+                        runnings.add(running);
+                    }
                 }
-                time=new Integer(data.get(i).get("Time"));
-                S=time%60;
-                HMS=time/60;
-                M=HMS%60;
-                H=HMS/60;
-                running.setTime((H>=10?(H+""):("0"+H))+":"+(M>=10?(M+""):("0"+M))+":"+(S>=10?(S+""):("0"+S)));
-                runnings.add(running);
-
-
             }
+        });
 
-        }
     }
 
     private void setAdapter() {

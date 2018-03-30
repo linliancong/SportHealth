@@ -4,6 +4,7 @@ package com.develop.sporthealth;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -53,7 +54,12 @@ public class MeUpdate extends AppCompatActivity implements TextWatcher,View.OnCl
             switch (msg.what){
                 case 0x001:
                     Toast.makeText(context,"修改成功",Toast.LENGTH_SHORT).show();
-                    sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.MeSy$MyBroad")));
+                    if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
+                        sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
+                    }
+                    else {
+                        sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.MeSy$MyBroad")));
+                    }
                     break;
                 case 0x002:
                     Toast.makeText(context,"修改失败",Toast.LENGTH_SHORT).show();

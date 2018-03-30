@@ -27,4 +27,8 @@
         <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="DialogNoTitle" parent="Base.Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item><!--除去title-->
+    </style>
+
 </resources>

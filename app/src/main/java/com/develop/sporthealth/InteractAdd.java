@@ -3,6 +3,7 @@ package com.develop.sporthealth;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -84,7 +85,12 @@ public class InteractAdd extends AppCompatActivity implements View.OnClickListen
                     public void done(AVException e) {
                         if(e==null){
                             Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
-                            sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
+                            if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
+                                sendBroadcast(new Intent("com.develop.sport.MYBROAD2"));
+                            }
+                            else {
+                                sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
+                            }
                             finish();
                         }else {
                             Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();

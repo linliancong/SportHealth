@@ -85,7 +85,18 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
             sp.setIsFirst(false);
         }
 
-        /*//消息表
+        /*//签到表
+        AVObject testObject1 = new AVObject("Sign");
+        testObject1.put("UserID", "");
+        testObject1.put("Date", "");
+        testObject1.put("Month", "");
+        testObject1.put("State","");
+        testObject1.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+            }
+        });
+        //消息表
         AVObject testObject1 = new AVObject("Messages");
         testObject1.put("UserID", "");
         testObject1.put("Date", "");
@@ -170,6 +181,10 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
             public void done(AVException e) {
             }
         });*/
+
+        /*String month=TimeTools.getCurMonth();
+        String year=TimeTools.getCurYear();
+        String week=TimeTools.getCurWeek();*/
 
         mAdapter=new FragmentAdapter(getSupportFragmentManager(),MainActivity.this);
         bindView();

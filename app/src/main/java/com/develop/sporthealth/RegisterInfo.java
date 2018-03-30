@@ -33,8 +33,9 @@ import java.util.List;
  * Created by Administrator on 2018/3/8.
  */
 
-public class RegisterInfo extends AppCompatActivity implements View.OnClickListener{
+public class RegisterInfo extends AppCompatActivity implements View.OnClickListener,TextWatcher{
 
+    private EditText username;
     private EditText name;
     private EditText sex;
     private EditText email;
@@ -46,6 +47,8 @@ public class RegisterInfo extends AppCompatActivity implements View.OnClickListe
     private SPTools sp;
     private SQLOperator op;
     private Context context;
+
+    private boolean isUser=true;
 
 
     @Override
@@ -61,12 +64,16 @@ public class RegisterInfo extends AppCompatActivity implements View.OnClickListe
         sp=new SPTools(context);
         op=new SQLOperator(context);
         email=findViewById(R.id.info_email);
+        username=findViewById(R.id.info_username);
         name=findViewById(R.id.info_name);
         sex=findViewById(R.id.info_sex);
         weight=findViewById(R.id.info_weight);
         qq=findViewById(R.id.info_qq);
         save =findViewById(R.id.info_btn);
         back=findViewById(R.id.info_back);
+        username.setText(sp.getUserName());
+
+        username.addTextChangedListener(this);
 
 
         save.setOnClickListener(this);
@@ -84,28 +91,43 @@ public class RegisterInfo extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.info_btn:
+                //判断用户名是否存在
                 AVQuery<AVObject> query = new AVQuery<>("UserInfo");
-                query.whereEqualTo("UserName",sp.getUserName());
+                query.whereEqualTo("UserName", username.getText().toString());
                 query.findInBackground(new FindCallback<AVObject>() {
                     @Override
                     public void done(List<AVObject> list, AVException e) {
-                        if(list.size()>0){
-                            sp.setID(list.get(0).getObjectId());
-                            // 第一参数是 className,第二个参数是 objectId
-                            AVObject testObject1 = AVObject.createWithoutData("UserInfo", sp.getID());
+                        if (list.size()>0){
+                            Toast.makeText(context,"用户名已存在，请重新输入",Toast.LENGTH_SHORT).show();
+                        }else {
+                            AVQuery<AVObject> query = new AVQuery<>("UserInfo");
+                            query.whereEqualTo("Phone", sp.getUserName());
+                            query.findInBackground(new FindCallback<AVObject>() {
+                                @Override
+                                public void done(List<AVObject> list, AVException e) {
+                                    if (list.size() > 0) {
+                                        sp.setID(list.get(0).getObjectId());
+                                        // 第一参数是 className,第二个参数是 objectId
+                                        AVObject testObject1 = AVObject.createWithoutData("UserInfo", sp.getID());
 
-                            testObject1.put("Name",name.getText().toString());
-                            testObject1.put("Sex",sex.getText().toString());
-                            testObject1.put("Email",email.getText().toString());
-                            testObject1.put("QQ",qq.getText().toString());
-                            testObject1.put("Weight",weight.getText().toString());
-                            testObject1.put("Phone","");
-                            // 保存到云端
-                            testObject1.saveInBackground();
-                            finish();
+                                        testObject1.put("Name", name.getText().toString());
+                                        testObject1.put("Sex", sex.getText().toString());
+                                        testObject1.put("Email", email.getText().toString());
+                                        testObject1.put("QQ", qq.getText().toString());
+                                        testObject1.put("Weight", weight.getText().toString());
+                                        testObject1.put("UserName", username.getText().toString());
+                                        testObject1.put("ImageUrl", "");
+                                        // 保存到云端
+                                        testObject1.saveInBackground();
+                                        sp.setUserName(username.getText().toString());
+                                        finish();
+                                    }
+                                }
+                            });
                         }
                     }
                 });
+
 
 
 
@@ -138,6 +160,39 @@ public class RegisterInfo extends AppCompatActivity implements View.OnClickListe
 
                 break;
 
+        }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        if(username.getText().toString().equals(sp.getUserName())){
+            isUser=false;
+        }
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        if(username.getText().toString().equals(sp.getUserName())){
+            isUser=false;
+        }else {
+            //判断用户名是否存在
+            AVQuery<AVObject> query = new AVQuery<>("UserInfo");
+            query.whereEqualTo("UserName", username.getText().toString());
+            query.findInBackground(new FindCallback<AVObject>() {
+                @Override
+                public void done(List<AVObject> list, AVException e) {
+                    if (list.size()>0){
+                        isUser=true;
+                    }else {
+                        isUser=false;
+                    }
+                }
+            });
         }
     }
 }

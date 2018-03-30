@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -111,8 +112,14 @@ public class MeSetting extends AppCompatActivity implements View.OnClickListener
             case R.id.setting_exit:
                 if(sp.getIsLogin()) {
                     sp.setIsLogin(false);
-                    sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.MeSy$MyBroad")));
-                    sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
+                    if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
+                        sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
+                        sendBroadcast(new Intent("com.develop.sport.MYBROAD2"));
+                    }
+                    else {
+                        sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.MeSy$MyBroad")));
+                        sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
+                    }
 
                     finish();
                 }else {

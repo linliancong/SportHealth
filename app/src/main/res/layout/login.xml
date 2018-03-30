@@ -12,7 +12,7 @@
         android:layout_height="80dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="60dp"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/logo"
         />
 
     <RelativeLayout
@@ -151,15 +151,30 @@
         android:enabled="true"
         android:background="@drawable/button"
         />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/register"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="注册"
-        android:textColor="@color/carrot"
-        android:background="@null"
-        android:layout_alignParentLeft="true"
-        />
+        <Button
+            android:id="@+id/register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="注册"
+            android:textColor="@color/carrot"
+            android:background="@null"
+            android:layout_alignParentLeft="true"
+            />
+
+        <Button
+            android:id="@+id/find"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="忘记密码？"
+            android:textColor="@color/carrot"
+            android:background="@null"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            />
+    </RelativeLayout>
 
 </LinearLayout>

@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -48,6 +49,7 @@ import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
+import com.develop.tools.TTSController;
 import com.develop.tools.TimeTools;
 import com.develop.tools.database.SQLOperator;
 
@@ -90,6 +92,13 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
     private Button play;
     private Button pause;
     private Button stop;
+
+    //倒数的控件
+    private RelativeLayout num_v;
+    private TextView num;
+    private int count=3;
+    //语音引擎
+    private TTSController mTTSManage;
 
     private Button share;
     //是否详细界面
@@ -181,6 +190,42 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                         speed.setText("--");
                     }
                     break;
+
+                case 0x002:
+                    // 移除所有的msg.what为0等消息，保证只有一个循环消息队列再跑
+                    handler.removeMessages(0x002);
+                    // app的功能逻辑处理
+                    if(count>0) {
+                        //语音播报
+                        mTTSManage.Speark(count+"");
+                        num_v.setVisibility(View.VISIBLE);
+                        num.setText((count--)+"");
+                    }else {
+                        num_v.setVisibility(View.GONE);
+                        visible.setVisibility(View.GONE);
+                        title.setVisibility(View.GONE);
+                        visible2.setVisibility(View.VISIBLE);
+                        handler.sendEmptyMessageDelayed(0x003,1000);
+                    }
+                    // 再次发出msg，循环更新
+                    handler.sendEmptyMessageDelayed(0x002, 1000);
+                    break;
+                case 0x003:
+                    // 直接移除，定时器停止
+                    handler.removeMessages(0x002);
+                    handler.sendEmptyMessage(0x004);
+                    break;
+                case 0x004:
+                    acquireWakeLock();
+                    //语音播报
+                    mTTSManage.Speark("开始运动");
+                    isStart=true;
+                    isFirst=false;
+                    //开始运动时地图轨迹、标记初始化
+                    polylineOptions=new PolylineOptions();
+                    markerOptions=new MarkerOptions();
+                    markers=new ArrayList<>();
+                    break;
             }
         }
     };
@@ -221,6 +266,14 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
         pause=findViewById(R.id.start_pause);
         stop=findViewById(R.id.start_stop);
         share=findViewById(R.id.start_share);
+
+        num_v=findViewById(R.id.start_num_v);
+        num=findViewById(R.id.start_num);
+        //实例化语音引擎
+        mTTSManage=TTSController.getInstance(getApplicationContext());
+        mTTSManage.init();
+
+
 
         start.setOnClickListener(this);
         slide.setOnClickListener(this);
@@ -333,6 +386,13 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
             mapClient.stopLocation();
             mapClient.onDestroy();
         }
+        mTTSManage.destroy();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mTTSManage.stopSpeaking();
     }
 
     @Override
@@ -513,16 +573,19 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 isStart=false;
                 if(System.currentTimeMillis()-mTime>2000)
                 {
+                    mTTSManage.Speark("再按一次退出运动");
                     Toast.makeText(getApplicationContext(),"再按一次退出",Toast.LENGTH_SHORT).show();
                     mTime=System.currentTimeMillis();
                 }
                 else {
+                    mTTSManage.Speark("运动已结束");
                     update();
                     super.onBackPressed();
                 }
                 break;
             case R.id.start_pause:
                 //暂停
+                mTTSManage.Speark("运动已暂停");
                 isStart=false;
                 tspeed=0;
                 handler.sendEmptyMessage(0x001);
@@ -533,6 +596,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 break;
             case R.id.start_play:
                 //继续
+                mTTSManage.Speark("运动继续");
                 isStart=true;
                 latLng2=null;
                 pause.setVisibility(View.VISIBLE);
@@ -577,7 +641,12 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                         public void done(AVException e) {
                             if(e==null){
                                 Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
-                                sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.InteractSy$MyBroad")));
+                                if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
+                                    sendBroadcast(new Intent("com.develop.sport.MYBROAD2"));
+                                }
+                                else {
+                                    sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
+                                }
                             }else {
                                 Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
                             }
@@ -678,7 +747,12 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     }
                 });
             }
-            sendBroadcast(new Intent("com.develop.sport.MYBROAD3").setComponent(new ComponentName("com.develop.sporthealth","com.develop.sporthealth.HomeSy$MyBroad")));
+            if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
+                sendBroadcast(new Intent("com.develop.sport.MYBROAD3"));
+            }
+            else {
+                sendBroadcast(new Intent("com.develop.sport.MYBROAD3").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.HomeSy$MyBroad")));
+            }
         }
         else
             {
@@ -757,16 +831,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                                 isFinish=true;
                                 RunID=avCloudQueryResult.getResults().get(0).getObjectId();
 
-                                acquireWakeLock();
-                                visible.setVisibility(View.GONE);
-                                visible2.setVisibility(View.VISIBLE);
-                                title.setVisibility(View.GONE);
-                                isStart=true;
-                                isFirst=false;
-                                //开始运动时地图轨迹、标记初始化
-                                polylineOptions=new PolylineOptions();
-                                markerOptions=new MarkerOptions();
-                                markers=new ArrayList<>();
+                                handler.sendEmptyMessage(0x002);
 
                             }else {
                                 isFinish=false;
@@ -795,6 +860,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
         if(isFirst){
             super.onBackPressed();
         }else {
+            mTTSManage.Speark("请先暂停，然后再双击退出按钮");
             Toast.makeText(context, "请先暂停，然后再双击退出按钮", Toast.LENGTH_SHORT).show();
         }
     }
