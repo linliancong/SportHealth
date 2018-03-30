@@ -62,4 +62,5 @@ dependencies {
     // LeanCloud 应用内搜索包
     compile 'cn.leancloud.android:avoscloud-search:v4.6.4@aar'
     compile files('libs/Msc.jar')
+    compile 'com.contrarywind:Android-PickerView:3.2.7'
 }

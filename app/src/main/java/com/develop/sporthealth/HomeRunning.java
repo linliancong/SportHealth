@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -51,7 +52,6 @@ public class HomeRunning extends AppCompatActivity {
         init();
         getData();
 
-        setAdapter();
     }
 
     private void init() {
@@ -111,6 +111,9 @@ public class HomeRunning extends AppCompatActivity {
                         running.setTime((H[0] >= 10 ? (H[0] + "") : ("0" + H[0])) + ":" + (M[0] >= 10 ? (M[0] + "") : ("0" + M[0])) + ":" + (S[0] >= 10 ? (S[0] + "") : ("0" + S[0])));
                         runnings.add(running);
                     }
+                    setAdapter();
+                }else {
+                    Toast.makeText(context,"没有数据",Toast.LENGTH_LONG).show();
                 }
             }
         });

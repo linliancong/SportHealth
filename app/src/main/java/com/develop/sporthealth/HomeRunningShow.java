@@ -3,9 +3,14 @@ package com.develop.sporthealth;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -25,6 +30,7 @@ import com.amap.api.maps.model.PolylineOptions;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.CountCallback;
 import com.avos.avoscloud.FindCallback;
 import com.develop.bean.Running;
 import com.develop.tools.MyLayout;
@@ -59,6 +65,55 @@ public class HomeRunningShow extends AppCompatActivity{
     private Marker marker;
     private List<Marker> markers;
     private MarkerOptions markerOptions;
+    private int count=0;
+    private int num=0;
+    private String str="";
+
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 0x001:
+                    //显示统计数据
+                    //final String[] str = {""};
+                    AVQuery<AVObject> query = new AVQuery<>("SportLocation");
+                    query.whereEqualTo("RunID",RunID);
+                    query.whereGreaterThanOrEqualTo("Time", str);
+                    query.orderByAscending("Time");
+                    query.limit(1000);
+                    query.findInBackground(new FindCallback<AVObject>() {
+                        @Override
+                        public void done(List<AVObject> list, AVException e) {
+                            if (list.size() > 0) {
+                                //latLngs= new ArrayList<>();
+                                String date1 = "";
+                                String date2 = "";
+                                int i = 0;
+                                double total = 0;
+                                for (; i < list.size(); i++) {
+                                    latLngs.add(new LatLng(new Double(list.get(i).get("Latitude").toString()), new Double(list.get(i).get("Longitude").toString())));
+                                    if(i==list.size()-1){
+                                        str =list.get(i).get("Time").toString();
+                                        num++;
+                                        if(num==count){
+                                            showMap();
+                                            handler.sendEmptyMessage(0x002);
+                                        }else {
+                                            handler.sendEmptyMessage(0x001);
+                                        }
+
+                                    }
+                                }
+                            }
+                            else {
+                                Toast.makeText(context,"查询失败",Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,25 +160,24 @@ public class HomeRunningShow extends AppCompatActivity{
 
     private void getData() {
         RunID=getIntent().getStringExtra("RunID");
-        //显示统计数据
+        //查询总共有几条记录
         AVQuery<AVObject> query = new AVQuery<>("SportLocation");
-        query.whereEqualTo("RunID",RunID);
-        query.orderByAscending("Time");
-        query.findInBackground(new FindCallback<AVObject>() {
+        query.whereEqualTo("RunID", RunID);
+        query.countInBackground(new CountCallback() {
             @Override
-            public void done(List<AVObject> list, AVException e) {
-                if (list.size() > 0) {
-                    String date1 = "";
-                    String date2 = "";
-                    int i = 0;
-                    double total = 0;
-                    for (; i < list.size(); i++) {
-                        latLngs.add(new LatLng(new Double(list.get(i).get("Latitude").toString()), new Double(list.get(i).get("Longitude").toString())));
+            public void done(int i, AVException e) {
+                if (e == null) {
+                    // 查询成功，输出计数
+                    if(i%1000>0){
+                        count=i/1000+1;
+                        handler.sendEmptyMessage(0x001);
                     }
-                    showMap();
+                } else {
+                    Toast.makeText(context,"查询失败",Toast.LENGTH_LONG).show();
                 }
             }
         });
+
 
         /*List<Map<String, String>> data = new ArrayList<>();
         data = op.select("select * from SportLocation where RunID=? order by Time asc", new String[]{RunID});

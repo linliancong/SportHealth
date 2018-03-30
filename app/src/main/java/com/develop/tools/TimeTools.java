@@ -50,6 +50,16 @@ public class TimeTools {
     }
 
     /**
+     * 返回当前的时间
+     * @return  今天 09:48
+     */
+    public static String getCurTime2(){
+        SimpleDateFormat dFormat = new SimpleDateFormat("HH:mm:ss");
+        String time = dFormat.format(System.currentTimeMillis());
+        return time;
+    }
+
+    /**
      * 获取运动记录是周几，今天则返回具体时间，其他则返回具体周几
      * @param dateStr
      * @return

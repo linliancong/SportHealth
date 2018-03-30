@@ -12,10 +12,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVPush;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.PushService;
 import com.avos.avoscloud.SaveCallback;
+import com.avos.avoscloud.SendCallback;
 import com.develop.bean.StepEntity;
 import com.develop.tools.AppManager;
 import com.develop.tools.CheckPermissionsTools;
@@ -84,6 +88,8 @@ public class MainActivity extends CheckPermissionsTools implements RadioGroup.On
             op.insert("insert into SportInfo(Name,Summary) values(?,?)",new String[]{"马拉松","如果你可以坚持着跑下来，那么不就的将来你就是马拉松冠军的热门人选了，加油！"});
             sp.setIsFirst(false);
         }
+
+
 
         /*//签到表
         AVObject testObject1 = new AVObject("Sign");

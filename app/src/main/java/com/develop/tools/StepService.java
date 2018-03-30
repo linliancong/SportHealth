@@ -24,11 +24,16 @@ import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVPush;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.PushService;
 import com.avos.avoscloud.SaveCallback;
+import com.avos.avoscloud.SendCallback;
 import com.develop.bean.StepEntity;
+import com.develop.sporthealth.HomeStartSport;
 import com.develop.sporthealth.MainActivity;
 import com.develop.sporthealth.R;
 import com.develop.sporthealth.RegisterInfo;
@@ -72,6 +77,7 @@ public class StepService extends Service implements SensorEventListener {
     private Intent nfIntent;
 
     private SPTools sp;
+    private Context context;
 
 
     @Override
@@ -86,6 +92,37 @@ public class StepService extends Service implements SensorEventListener {
         //startTimeCount();
         sp=new SPTools(StepService.this);
         initTodayData();
+        context=StepService.this;
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true){
+                    //定时推送消息
+                    String str1=sp.getDate();
+                    String str2=TimeTools.getCurTime2();
+                    if(sp.getDate().equals(TimeTools.getCurTime2())) {
+                        // 设置默认打开的 Activity
+                        PushService.setDefaultPushCallback(context, HomeStartSport.class);
+
+                        AVQuery pushQuery = AVInstallation.getQuery();
+                        // 这里开启消息推送服务
+                        pushQuery.whereEqualTo("installationId", sp.getInstallationId());
+                        AVPush.sendMessageInBackground("你今天还没有运动哦，赶紧去运动吧！", pushQuery, new SendCallback() {
+                            @Override
+                            public void done(AVException e) {
+
+                            }
+                        });
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     @Nullable

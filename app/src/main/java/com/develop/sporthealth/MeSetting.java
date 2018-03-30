@@ -28,6 +28,7 @@ public class MeSetting extends AppCompatActivity implements View.OnClickListener
     private RelativeLayout pwd;
     private RelativeLayout exit;
     private RelativeLayout gy;
+    private RelativeLayout date;
     private MyLayout back;
 
     private SPTools sp;
@@ -47,12 +48,14 @@ public class MeSetting extends AppCompatActivity implements View.OnClickListener
         exit=findViewById(R.id.setting_exit);
         gy=findViewById(R.id.setting_gy);
         back=findViewById(R.id.setting_back);
+        date=findViewById(R.id.setting_time);
 
         sp=new SPTools(context);
 
         pwd.setOnClickListener(this);
         exit.setOnClickListener(this);
         gy.setOnClickListener(this);
+        date.setOnClickListener(this);
 
         back.setOnClickListener(new MyLayout.OnClickListener() {
             @Override
@@ -130,6 +133,10 @@ public class MeSetting extends AppCompatActivity implements View.OnClickListener
             case R.id.setting_gy:
                 Intent intent=new Intent(context,MeGy.class);
                 startActivity(intent);
+                break;
+            case R.id.setting_time:
+                Intent intent1=new Intent(context,MeTime.class);
+                startActivity(intent1);
                 break;
         }
 

@@ -74,6 +74,29 @@ public class SPTools {
         return sp.getString("Image","");
     }
 
+    //用户推送的ID
+    public void setInstallationId(String InstallationId){
+        editor.putString("InstallationId",InstallationId);
+        editor.commit();
+    }
+
+    public String getDate()
+    {
+        return sp.getString("Date","");
+    }
+
+    //用户推送的ID
+    public void setDate(String Date){
+        editor.putString("Date",Date);
+        editor.commit();
+    }
+
+
+    public String getInstallationId()
+    {
+        return sp.getString("InstallationId","");
+    }
+
     //用户头像URL
     public void setImage(String Image){
         editor.putString("Image",Image);

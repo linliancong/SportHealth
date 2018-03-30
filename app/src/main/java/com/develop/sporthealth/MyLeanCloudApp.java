@@ -1,8 +1,10 @@
 package com.develop.sporthealth;
 
 import android.app.Application;
+import android.os.Build;
 
 import com.avos.avoscloud.AVOSCloud;
+import com.avos.avoscloud.PushService;
 import com.develop.tools.singtools.ResolutionUtil;
 
 /**
@@ -22,6 +24,9 @@ public class MyLeanCloudApp extends Application {
         AVOSCloud.setDebugLogEnabled(true);
         // 启用北美节点, 需要在 initialize 之前调用
         //AVOSCloud.useAVCloudUS();
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O) {
+            PushService.setDefaultChannelId(this, "public");
+        }
         // 初始化参数依次为 this, AppId, AppKey
         AVOSCloud.initialize(this,"jTA44pykLbSjHhNSch2vfrIU-gzGzoHsz","ixoFaSyVCq4FL9vNLSCOmCvb");
     }

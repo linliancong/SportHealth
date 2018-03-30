@@ -117,6 +117,7 @@ public class RegisterInfo extends AppCompatActivity implements View.OnClickListe
                                         testObject1.put("Weight", weight.getText().toString());
                                         testObject1.put("UserName", username.getText().toString());
                                         testObject1.put("ImageUrl", "");
+                                        testObject1.put("SendTime", "");
                                         // 保存到云端
                                         testObject1.saveInBackground();
                                         sp.setUserName(username.getText().toString());

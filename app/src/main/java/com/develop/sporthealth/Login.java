@@ -15,9 +15,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.SaveCallback;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
 
@@ -82,6 +84,36 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.login:
+                AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
+                    public void done(AVException e) {
+                        if (e == null) {
+                            // 保存成功
+                            final String installationId = AVInstallation.getCurrentInstallation().getInstallationId();
+                            // 关联  installationId 到用户表等操作……
+                            AVQuery<AVObject> query = new AVQuery<>("UserInfo");
+                            query.whereEqualTo("UserName", user.getText().toString());
+                            query.findInBackground(new FindCallback<AVObject>() {
+                                @Override
+                                public void done(List<AVObject> list, AVException e) {
+                                    if (list.size() > 0) {
+                                        sp.setID(list.get(0).getObjectId());
+                                        // 第一参数是 className,第二个参数是 objectId
+                                        AVObject testObject1 = AVObject.createWithoutData("UserInfo", sp.getID());
+
+                                        testObject1.put("InstallationId", installationId);
+
+                                        // 保存到云端
+                                        testObject1.saveInBackground();
+                                        sp.setInstallationId(installationId);
+                                        finish();
+                                    }
+                                }
+                            });
+                        } else {
+                            // 保存失败，输出错误信息
+                        }
+                    }
+                });
                 AVQuery<AVObject> query1 = new AVQuery<>("UserInfo");
                 query1.whereEqualTo("UserName",user.getText().toString());
                 AVQuery<AVObject> query2 = new AVQuery<>("UserInfo");
@@ -98,6 +130,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
                             sp.setName(list.get(0).get("Name").toString());
                             if(list.get(0).get("ImageUrl")!=null) {
                                 sp.setImage(list.get(0).get("ImageUrl").toString());
+                            }
+                            if(list.get(0).get("SendTime")!=null) {
+                                sp.setDate(list.get(0).get("SendTime").toString());
                             }
                             //String str=list.get(0).get("Weight").toString();
                             if (!list.get(0).get("Weight").toString().equals("")) {
