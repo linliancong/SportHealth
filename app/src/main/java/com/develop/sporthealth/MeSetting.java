@@ -123,7 +123,7 @@ public class MeSetting extends AppCompatActivity implements View.OnClickListener
                         sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.MeSy$MyBroad")));
                         sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
                     }
-
+                    sp.setDate("");
                     finish();
                 }else {
                     Toast.makeText(context,"请先登录~",Toast.LENGTH_LONG).show();

@@ -54,7 +54,7 @@ public class TimeTools {
      * @return  今天 09:48
      */
     public static String getCurTime2(){
-        SimpleDateFormat dFormat = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat dFormat = new SimpleDateFormat("HH:mm");
         String time = dFormat.format(System.currentTimeMillis());
         return time;
     }

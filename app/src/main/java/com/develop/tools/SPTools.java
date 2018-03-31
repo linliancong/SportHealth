@@ -69,6 +69,12 @@ public class SPTools {
         editor.commit();
     }
 
+    //用户头像URL
+    public void setImage(String Image){
+        editor.putString("Image",Image);
+        editor.commit();
+    }
+
     public String getImage()
     {
         return sp.getString("Image","");
@@ -80,28 +86,33 @@ public class SPTools {
         editor.commit();
     }
 
-    public String getDate()
-    {
-        return sp.getString("Date","");
-    }
-
-    //用户推送的ID
-    public void setDate(String Date){
-        editor.putString("Date",Date);
-        editor.commit();
-    }
-
-
     public String getInstallationId()
     {
         return sp.getString("InstallationId","");
     }
 
-    //用户头像URL
-    public void setImage(String Image){
-        editor.putString("Image",Image);
+    //用户推送的时间
+    public void setDate(String Date){
+        editor.putString("Date",Date);
         editor.commit();
     }
+
+    public String getDate()
+    {
+        return sp.getString("Date","");
+    }
+
+    //今天是否推送
+    public void setIsSend(boolean IsSend){
+        editor.putBoolean("IsSend",IsSend);
+        editor.commit();
+    }
+
+    public boolean getIsSend()
+    {
+        return sp.getBoolean("IsSend",false);
+    }
+
 
 
     public String getPWD()

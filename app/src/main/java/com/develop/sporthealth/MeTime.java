@@ -66,7 +66,7 @@ public class MeTime extends AppCompatActivity implements View.OnClickListener,Te
             }
         })
                 .setDate(selectedDate)
-                .setType(new boolean[]{false,false,false,true,true,true})
+                .setType(new boolean[]{false,false,false,true,true,false})
                 .setLabel("","","","","","")
                 .build();
         //精确到秒的时间显示
@@ -76,7 +76,7 @@ public class MeTime extends AppCompatActivity implements View.OnClickListener,Te
 
     //可根据需要自行截取数据显示
     private String getTime(Date date) {
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm");
         return format.format(date);
     }
 
@@ -89,6 +89,7 @@ public class MeTime extends AppCompatActivity implements View.OnClickListener,Te
                 // 保存到云端
                 testObject1.saveInBackground();
                 sp.setDate(edit.getText().toString());
+                sp.setIsSend(false);
                 finish();
                 break;
             case R.id.time_txt_update:

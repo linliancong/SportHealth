@@ -1,6 +1,7 @@
 package com.develop.tools;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -71,6 +72,7 @@ public class StepService extends Service implements SensorEventListener {
     private int hasStepCount;
     //下次记录之前的步数
     private int previousStepCount;
+
     private Notification.Builder builder;
 
     private NotificationManager notificationManager;
@@ -94,7 +96,7 @@ public class StepService extends Service implements SensorEventListener {
         initTodayData();
         context=StepService.this;
 
-        new Thread(new Runnable() {
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true){
@@ -122,7 +124,7 @@ public class StepService extends Service implements SensorEventListener {
                     }
                 }
             }
-        }).start();
+        }).start();*/
     }
 
     @Nullable
@@ -140,7 +142,12 @@ public class StepService extends Service implements SensorEventListener {
          */
         notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         //获取一个Notification构造器
-        builder = new Notification.Builder(this.getApplicationContext());
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+            builder = new Notification.Builder(this.getApplicationContext(),"sporthealth");
+            notificationManager.createNotificationChannel(new NotificationChannel("sporthealth","ces",NotificationManager.IMPORTANCE_HIGH));
+        }else {
+            builder = new Notification.Builder(this.getApplicationContext());
+        }
         /**
          * 设置点击通知栏打开的界面，此处需要注意了，如果你的计步界面不在主界面，则需要判断app是否已经启动，
          * 再来确定跳转页面，这里面太多坑
@@ -349,10 +356,41 @@ public class StepService extends Service implements SensorEventListener {
      * 保存当天的数据到数据库中，并去刷新通知栏
      */
     private void saveStepData() {
+        //推送消息
+        if(!sp.getIsSend()&&!sp.getDate().equals("")) {
+            int setDay=0;
+            int toDay=0;
+            String[] setDays=sp.getDate().split(":");
+            String[] toDays=TimeTools.getCurTime2().split(":");
+            setDay=new Integer(setDays[0])+new Integer(setDays[1]);
+            toDay=new Integer(toDays[0])+new Integer(toDays[1]);
+            if (toDay>=setDay) {
+                sp.setIsSend(true);
+                // 设置默认打开的 Activity
+                PushService.setDefaultPushCallback(context, HomeStartSport.class);
+
+                AVQuery pushQuery = AVInstallation.getQuery();
+                // 这里开启消息推送服务
+                pushQuery.whereEqualTo("installationId", sp.getInstallationId());
+                AVPush.sendMessageInBackground("你今天还没有运动哦，赶紧去运动吧！", pushQuery, new SendCallback() {
+                    @Override
+                    public void done(AVException e) {
+                        if(e==null){
+                            sp.setIsSend(true);
+                        }else {
+                            sp.setIsSend(false);
+                        }
+
+                    }
+                });
+            }
+        }
         //查询数据库中的数据
         StepEntity entity = op.getCurDataByDate(CURRENT_DATE,sp.getID());
         //为空则说明还没有该天的数据，有则说明已经开始当天的计步了
         if (entity == null) {
+            //这里设置新的一天推送置为false
+            sp.setIsSend(false);
             //没有则新建一条数据
             entity = new StepEntity();
             entity.setCurDate(CURRENT_DATE);
