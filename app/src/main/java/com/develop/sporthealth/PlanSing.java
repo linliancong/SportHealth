@@ -140,7 +140,7 @@ public class PlanSing extends AppCompatActivity {
     //获取签到的时间
     private void getData() {
         Calendar calendar = Calendar.getInstance();
-        int month = calendar.get(Calendar.MONTH);
+        final int month = calendar.get(Calendar.MONTH);
 
        /* tvSignDay.setText(Html.fromHtml(String.format(getString(R.string.you_have_sign), "#999999", "#1B89CD", 3)));
         tvScore.setText(String.valueOf(3015));*/
@@ -149,6 +149,8 @@ public class PlanSing extends AppCompatActivity {
 
         final Calendar calendarToday = Calendar.getInstance();
         final int dayOfMonthToday = calendarToday.get(Calendar.DAY_OF_MONTH);
+
+        final int mon= calendar.getActualMaximum(Calendar.DATE);
 
         data = new ArrayList<>();
         //查询签到数据
@@ -164,7 +166,7 @@ public class PlanSing extends AppCompatActivity {
                public void done(List<AVObject> list, AVException e) {
                    if (list.size() > 0) {
                        //这里初始化所有的日期
-                       for (int i = 0; i < 30; i++) {
+                       for (int i = 0; i < mon; i++) {
                            SignEntity signEntity = new SignEntity();
                            if (dayOfMonthToday == i + 1)
                                signEntity.setDayType(2);
@@ -188,7 +190,7 @@ public class PlanSing extends AppCompatActivity {
                            }
                        }
                    }else {
-                       for (int i = 0; i < 30; i++) {
+                       for (int i = 0; i < mon; i++) {
                            SignEntity signEntity = new SignEntity();
                            if (dayOfMonthToday == i + 1)
                                signEntity.setDayType(2);
@@ -255,4 +257,5 @@ public class PlanSing extends AppCompatActivity {
             signToday();
         }
     };
+
 }
