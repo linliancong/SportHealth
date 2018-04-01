@@ -92,19 +92,19 @@ public class PlanSing extends AppCompatActivity {
         }
 
         //---------------------------------分辨率适配----------------------------------
-        ResolutionUtil resolutionUtil = ResolutionUtil.getInstance();
+       /* ResolutionUtil resolutionUtil = ResolutionUtil.getInstance();
 
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
         layoutParams.topMargin = resolutionUtil.formatVertical(40);
-        /*tvSignDay.setLayoutParams(layoutParams);
-        tvSignDay.setTextSize(TypedValue.COMPLEX_UNIT_PX, resolutionUtil.formatVertical(42));*/
+        *//*tvSignDay.setLayoutParams(layoutParams);
+        tvSignDay.setTextSize(TypedValue.COMPLEX_UNIT_PX, resolutionUtil.formatVertical(42));*//*
 
         layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
         layoutParams.topMargin = resolutionUtil.formatVertical(40);
-       /* tvScore.setLayoutParams(layoutParams);
-        tvScore.setTextSize(TypedValue.COMPLEX_UNIT_PX, resolutionUtil.formatVertical(95));*/
+       *//* tvScore.setLayoutParams(layoutParams);
+        tvScore.setTextSize(TypedValue.COMPLEX_UNIT_PX, resolutionUtil.formatVertical(95));*//*
 
         layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, resolutionUtil.formatVertical(130));
         layoutParams.topMargin = resolutionUtil.formatVertical(54);
@@ -134,7 +134,7 @@ public class PlanSing extends AppCompatActivity {
         if (btnSign != null) {
             btnSign.setLayoutParams(layoutParams);
             btnSign.setTextSize(TypedValue.COMPLEX_UNIT_PX, resolutionUtil.formatVertical(54));
-        }
+        }*/
     }
 
     //获取签到的时间
