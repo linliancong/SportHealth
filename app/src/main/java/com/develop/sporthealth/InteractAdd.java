@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.CountCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
@@ -72,31 +74,45 @@ public class InteractAdd extends AppCompatActivity implements View.OnClickListen
             case R.id.add_send:
                 time = TimeTools.getCurrentDate2();
                 //这里新增一条数据传到服务器
-                AVObject testObject1 = new AVObject("Share");
-                testObject1.put("UserID",sp.getID());
-                testObject1.put("UserName",sp.getUserName());
-                testObject1.put("Title","健身心得与知识");
-                testObject1.put("Content",content.getText().toString());
-                testObject1.put("Date",time);
-                testObject1.put("Count","0");
-                testObject1.put("ImageUrl",sp.getImage());
-                testObject1.saveInBackground(new SaveCallback() {
+                //从服务器中获取数据
+                AVQuery<AVObject> query = new AVQuery<>("SportFinish");
+                query.whereEqualTo("UserID", sp.getID());
+                query.countInBackground(new CountCallback() {
                     @Override
-                    public void done(AVException e) {
-                        if(e==null){
-                            Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
-                            if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
-                                sendBroadcast(new Intent("com.develop.sport.MYBROAD2"));
-                            }
-                            else {
-                                sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
-                            }
-                            finish();
+                    public void done(int i, AVException e) {
+                        if (e == null) {
+                            AVObject testObject1 = new AVObject("Share");
+                            testObject1.put("UserID",sp.getID());
+                            testObject1.put("UserName",sp.getUserName());
+                            testObject1.put("Title","健身心得与知识");
+                            testObject1.put("Content",content.getText().toString());
+                            testObject1.put("Date",time);
+                            testObject1.put("Count","0");
+                            testObject1.put("ImageUrl",sp.getImage());
+                            testObject1.put("Rank",i);
+                            testObject1.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(AVException e) {
+                                    if(e==null){
+                                        Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
+                                        if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
+                                            sendBroadcast(new Intent("com.develop.sport.MYBROAD2"));
+                                        }
+                                        else {
+                                            sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
+                                        }
+                                        finish();
+                                    }else {
+                                        Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                         }else {
                             Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+
                 /*op.insert("insert into Share(UserID,Title,Content,Date,Count) values(?,?,?,?,0)",new String[]{sp.getID(),"健身心得与知识",content.getText().toString(), time});
                 //判断是否分享成功
                 List<Map<String, String>> data = new ArrayList<>();

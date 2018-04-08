@@ -30,15 +30,15 @@
         <!-- 反馈组件 END -->
 
         <!--高德地图配置(发布版本+调试版本)-->
-        <!--<meta-data
-            android:name="com.amap.api.v2.apikey"
-            android:value="38235debd0fd656778de6542ae3b6b53"
-            />-->
-
-        <!--高德地图配置(调试版本2)-->
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="91641b1db69aca36b9dd4fddba93ebb9"/>
+            android:value="38235debd0fd656778de6542ae3b6b53"
+            />
+
+        <!--高德地图配置(调试版本2)-->
+       <!-- <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="91641b1db69aca36b9dd4fddba93ebb9"/>-->
 
 
         <activity android:name=".MainActivity">
@@ -199,6 +199,13 @@
         <activity android:name=".MeTime">
             <intent-filter>
                 <action android:name="android.intent.action.METIME" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".PlanRanking">
+            <intent-filter>
+                <action android:name="android.intent.action.PLANRANKING" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

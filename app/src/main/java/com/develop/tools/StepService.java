@@ -342,7 +342,35 @@ public class StepService extends Service implements SensorEventListener {
             }
         }
         //实时的存储数据
-        saveStepData();
+        //查询数据库中的数据
+        StepEntity entity = op.getCurDataByDate(CURRENT_DATE,sp.getID());
+        if (entity == null) {
+            AVQuery<AVObject> query1 = new AVQuery<>("Step");
+            query1.whereEqualTo("UserID", sp.getID());
+            AVQuery<AVObject> query2 = new AVQuery<>("Step");
+            query2.whereEqualTo("Date", TimeTools.getCurrentDate());
+            AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+            query.findInBackground(new FindCallback<AVObject>() {
+                @Override
+                public void done(List<AVObject> list, AVException e) {
+                    if (list.size() > 0) {
+                        for(int i=0;i<list.size();i++) {
+
+                            // 第一参数是 className,第二个参数是 objectId
+                            AVObject testObject1 = AVObject.createWithoutData("Step", list.get(i).getObjectId());
+
+                            // 保存到云端
+                            testObject1.deleteInBackground();
+                        }
+                    }
+                    saveStepData();
+                }
+            });
+        }else {
+            saveStepData();
+        }
+
+
     }
 
     @Override

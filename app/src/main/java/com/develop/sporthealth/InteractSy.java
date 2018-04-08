@@ -31,6 +31,7 @@ import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.GetDataCallback;
 import com.avos.avoscloud.ProgressCallback;
+import com.avos.avoscloud.SaveCallback;
 import com.develop.bean.ShareMsg;
 import com.develop.tools.AdapterTools;
 import com.develop.tools.SPTools;
@@ -192,6 +193,7 @@ public class InteractSy extends Fragment {
                         shareMsg.setContent(list.get(i).get("Content").toString());
                         shareMsg.setUserID(list.get(i).get("UserID").toString());
                         shareMsg.setImageUrl(list.get(i).get("ImageUrl").toString());
+                        shareMsg.setRank(list.get(i).get("Rank").toString());
                         if (list.get(i).get("Count") != null) {
                             shareMsg.setNum(list.get(i).get("Count").toString());
                         } else {
@@ -216,6 +218,18 @@ public class InteractSy extends Fragment {
                 holder.setText(R.id.inte_item_username,obj.getName());
                 holder.setText(R.id.inte_item_content,obj.getContent());
                 holder.setText(R.id.inte_item_num,obj.getNum());
+                int count=new Integer(obj.getRank());
+                if(count<10){
+                    holder.setImageResource(R.id.inte_item_rank,R.mipmap.head1);
+                }else if(count<50){
+                    holder.setImageResource(R.id.inte_item_rank,R.mipmap.head2);
+                }else if(count<100){
+                    holder.setImageResource(R.id.inte_item_rank,R.mipmap.head3);
+                }else if(count<200){
+                    holder.setImageResource(R.id.inte_item_rank,R.mipmap.head4);
+                }else if(count>=200){
+                    holder.setImageResource(R.id.inte_item_rank,R.mipmap.head5);
+                }
                 if(readImage(obj.getUserID())!=null) {
                     holder.setImageBitmap(R.id.inte_item_userimg, readImage(obj.getUserID()));
                 }else {
@@ -237,20 +251,67 @@ public class InteractSy extends Fragment {
 
         adapter.setOnItemClickListener(new AdapterTools.onItemClickListener() {
             @Override
-            public void onItemClick(int i) {
-                int num=0;
-                if(shareMsgs.get(i).getNum()!=null) {
-                    num = new Integer(shareMsgs.get(i).getNum());
-                }
-                shareMsgs.get(i).setNum((num+1)+"");
-                adapter.notifyDataSetChanged();
+            public void onItemClick(final int i) {
+                AVQuery<AVObject> query1 = new AVQuery<>("Praise");
+                query1.whereEqualTo("UserID",sp.getID());
+                AVQuery<AVObject> query2 = new AVQuery<>("Praise");
+                query2.whereEqualTo("ShareID",shareMsgs.get(i).getId());
+                AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+                query.findInBackground(new FindCallback<AVObject>() {
+                    @Override
+                    public void done(List<AVObject> list, AVException e) {
+                        int num=0;
+                        if(shareMsgs.get(i).getNum()!=null) {
+                            num = new Integer(shareMsgs.get(i).getNum());
+                        }
+                        if (list.size()==1){
+                            shareMsgs.get(i).setNum((num-1)+"");
+                            adapter.notifyDataSetChanged();
+                            // 第一参数是 className,第二个参数是 objectId
+                            AVObject testObject1 = AVObject.createWithoutData("Share", shareMsgs.get(i).getId());
+                            testObject1.put("Count", shareMsgs.get(i).getNum());
+                            // 保存到云端
+                            testObject1.saveInBackground();
+                            Toast.makeText(context,"取消点赞~",Toast.LENGTH_SHORT).show();
+
+                            //这里删除一个数据
+                            // 第一参数是 className,第二个参数是 objectId
+                            AVObject testObject = AVObject.createWithoutData("Praise", list.get(0).getObjectId());
+                            // 保存到云端
+                            testObject.deleteInBackground();
+
+                        }else if(list.size()==0){
+                            AVObject testObject1 = new AVObject("Praise");
+                            testObject1.put("UserID",sp.getID());
+                            testObject1.put("ShareID",shareMsgs.get(i).getId());
+                            final int nums=num+1;
+                            testObject1.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(AVException e) {
+                                    if(e == null){
+                                        shareMsgs.get(i).setNum((nums)+"");
+                                        adapter.notifyDataSetChanged();
+                                        // 第一参数是 className,第二个参数是 objectId
+                                        AVObject testObject1 = AVObject.createWithoutData("Share", shareMsgs.get(i).getId());
+                                        testObject1.put("Count", shareMsgs.get(i).getNum());
+                                        // 保存到云端
+                                        testObject1.saveInBackground();
+                                        Toast.makeText(context,"点赞成功~",Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        Toast.makeText(context, "点赞失败，请稍后重试", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+
+
+                    }
+                });
+
+
                 //op.insert("update Share set Count=? where id=?",new String[]{shareMsgs.get(i).getNum(),shareMsgs.get(i).getId()});
 
-                // 第一参数是 className,第二个参数是 objectId
-                AVObject testObject1 = AVObject.createWithoutData("Share", shareMsgs.get(i).getId());
-                testObject1.put("Count", shareMsgs.get(i).getNum());
-                // 保存到云端
-                testObject1.saveInBackground();
+
 
                 //Toast.makeText(context,"你点击了~"+i,Toast.LENGTH_SHORT).show();
             }

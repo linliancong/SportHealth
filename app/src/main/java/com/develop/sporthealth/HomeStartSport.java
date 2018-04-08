@@ -44,6 +44,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.CloudQueryCallback;
+import com.avos.avoscloud.CountCallback;
 import com.avos.avoscloud.DeleteCallback;
 import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.SaveCallback;
@@ -609,7 +610,7 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                 //判断是否达标，达标则将数据计入完成表中
                 //if(SportID.equals("2") && distance>=5 || SportID.equals("3") && distance>=10 || SportID.equals("4") && distance>=21.0975 || SportID.equals("5") && distance>=42.195)
                 {
-                    String title = "";
+                    /*String title = "";
                     String content = "";
                     String time = TimeTools.getCurrentDate2();
                     if (SportID.equals("2")) {
@@ -624,29 +625,57 @@ public class HomeStartSport extends AppCompatActivity implements AMapLocationLis
                     if (SportID.equals("5")) {
                         title = "马拉松";
                     }
-                    content = "我在" + TimeTools.getCurrentDate() + "完成了" + title + "任务！";
+                    content = "我在" + TimeTools.getCurrentDate() + "完成了" + title + "任务！";*/
 
                     //op.insert("insert into Share(UserID,Title,Content,Date,Count) values(?,?,?,?,0)",new String[]{sp.getID(), title, content, time});
                     //这里新增一条数据传到服务器
-                    AVObject testObject1 = new AVObject("Share");
-                    testObject1.put("UserID",sp.getID());
-                    testObject1.put("UserName",sp.getUserName());
-                    testObject1.put("Title",title);
-                    testObject1.put("Content",content);
-                    testObject1.put("Date",time);
-                    testObject1.put("Count","0");
-                    testObject1.put("ImageUrl",sp.getImage());
-                    testObject1.saveInBackground(new SaveCallback() {
+                    AVQuery<AVObject> query = new AVQuery<>("SportFinish");
+                    query.whereEqualTo("UserID", sp.getID());
+                    query.countInBackground(new CountCallback() {
                         @Override
-                        public void done(AVException e) {
-                            if(e==null){
-                                Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
-                                if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
-                                    sendBroadcast(new Intent("com.develop.sport.MYBROAD2"));
+                        public void done(int i, AVException e) {
+                            if (e == null) {
+                                String title = "";
+                                String content = "";
+                                String time = TimeTools.getCurrentDate2();
+                                if (SportID.equals("2")) {
+                                    title = "5公里跑步";
                                 }
-                                else {
-                                    sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
+                                if (SportID.equals("3")) {
+                                    title = "10公里跑步";
                                 }
+                                if (SportID.equals("4")) {
+                                    title = "半程马拉松";
+                                }
+                                if (SportID.equals("5")) {
+                                    title = "马拉松";
+                                }
+                                content = "我在" + TimeTools.getCurrentDate() + "完成了" + title + "任务！";
+
+                                AVObject testObject1 = new AVObject("Share");
+                                testObject1.put("UserID", sp.getID());
+                                testObject1.put("UserName", sp.getUserName());
+                                testObject1.put("Title", title);
+                                testObject1.put("Content", content);
+                                testObject1.put("Date", time);
+                                testObject1.put("Count", "0");
+                                testObject1.put("ImageUrl", sp.getImage());
+                                testObject1.put("Rank",i);
+                                testObject1.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(AVException e) {
+                                        if (e == null) {
+                                            Toast.makeText(context, "分享成功", Toast.LENGTH_SHORT).show();
+                                            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                                                sendBroadcast(new Intent("com.develop.sport.MYBROAD2"));
+                                            } else {
+                                                sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
+                                            }
+                                        } else {
+                                            Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
                             }else {
                                 Toast.makeText(context, "分享失败！请稍后重试", Toast.LENGTH_SHORT).show();
                             }

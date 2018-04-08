@@ -37,6 +37,7 @@ public class PlanSy extends Fragment implements View.OnClickListener{
     private SPTools sp;
 
     private RelativeLayout sign;
+    private RelativeLayout ranking;
     private RelativeLayout statistics;
     private RelativeLayout walk;
     private RelativeLayout running;
@@ -218,6 +219,7 @@ public class PlanSy extends Fragment implements View.OnClickListener{
         op=new SQLOperator(context);
         sp=new SPTools(context);
         sign=view.findViewById(R.id.plan_sign);
+        ranking=view.findViewById(R.id.plan_ranking);
         statistics=view.findViewById(R.id.plan_statistics);
         walk=view.findViewById(R.id.plan_walk);
         running=view.findViewById(R.id.plan_running);
@@ -227,6 +229,7 @@ public class PlanSy extends Fragment implements View.OnClickListener{
         remind_v=view.findViewById(R.id.plan_remind_v);
 
         sign.setOnClickListener(this);
+        ranking.setOnClickListener(this);
         statistics.setOnClickListener(this);
         walk.setOnClickListener(this);
         running.setOnClickListener(this);
@@ -242,9 +245,13 @@ public class PlanSy extends Fragment implements View.OnClickListener{
                 Intent intent11=new Intent(context,PlanSing.class);
                 startActivity(intent11);
                 break;
-            case R.id.plan_statistics:
-                Intent intent22=new Intent(context,PlanStatistics.class);
+            case R.id.plan_ranking:
+                Intent intent22=new Intent(context,PlanRanking.class);
                 startActivity(intent22);
+                break;
+            case R.id.plan_statistics:
+                Intent intent33=new Intent(context,PlanStatistics.class);
+                startActivity(intent33);
                 break;
             case R.id.plan_running:
                 Intent intent1=new Intent(context,PlanRunning.class);

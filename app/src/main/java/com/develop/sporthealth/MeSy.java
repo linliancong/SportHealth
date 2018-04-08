@@ -34,10 +34,13 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.CountCallback;
+import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.GetDataCallback;
 import com.avos.avoscloud.ProgressCallback;
 import com.avos.avoscloud.SaveCallback;
+import com.develop.bean.ShareMsg;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
@@ -140,9 +143,32 @@ public class MeSy extends Fragment implements View.OnClickListener{
             filter.addAction("com.develop.sport.MYBROAD");
             getActivity().registerReceiver(broad,filter);
 
-            if(!sp.getIsLogin()) {
+            if(sp.getIsLogin()) {
                 //计算等级
-                data=op.select("select count(*) num from SportFinish where UserID=?", new String[]{sp.getID()});
+                //从服务器中获取数据
+                //查询总共有几条记录
+                AVQuery<AVObject> query = new AVQuery<>("SportFinish");
+                query.whereEqualTo("UserID", sp.getID());
+                query.countInBackground(new CountCallback() {
+                    @Override
+                    public void done(int i, AVException e) {
+                        if (e == null) {
+                            count=i;
+                            if(count<10){
+                                img_dj.setImageResource(R.mipmap.rank_level1);
+                            }else if(count<50){
+                                img_dj.setImageResource(R.mipmap.rank_level2);
+                            }else if(count<100){
+                                img_dj.setImageResource(R.mipmap.rank_level3);
+                            }else if(count<200){
+                                img_dj.setImageResource(R.mipmap.rank_level4);
+                            }else if(count>=200){
+                                img_dj.setImageResource(R.mipmap.rank_level5);
+                            }
+                        }
+                    }
+                });
+                /*data=op.select("select count(*) num from SportFinish where UserID=?", new String[]{sp.getID()});
                 if (data.size() != 0) {
                     count=new Integer(data.get(0).get("num"));
                     if(count<10){
@@ -157,7 +183,7 @@ public class MeSy extends Fragment implements View.OnClickListener{
                         img_dj.setImageResource(R.mipmap.rank_level5);
                     }
 
-                }
+                }*/
             }
 
 

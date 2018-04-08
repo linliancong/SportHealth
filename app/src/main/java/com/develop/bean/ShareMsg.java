@@ -15,6 +15,7 @@ public class ShareMsg {
     private String num;
     private String id;
     private String imageUrl;
+    private String rank;
 
 
     public ShareMsg(){}
@@ -73,5 +74,13 @@ public class ShareMsg {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getRank() {
+        return rank;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
     }
 }

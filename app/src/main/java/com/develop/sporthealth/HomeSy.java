@@ -24,6 +24,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
 import com.develop.bean.StepEntity;
 import com.develop.tools.SPTools;
 import com.develop.tools.StepCountCheckUtil;
@@ -35,6 +39,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -108,13 +113,25 @@ public class HomeSy extends Fragment implements View.OnClickListener,android.os.
         public void handleMessage(android.os.Message msg) {
             switch (msg.what) {
                 case 0x001:
-                    try {
-                        getChartDate();
-                        getAxisXLables();
-                        initLineChart();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                    //每次都从服务器把最新的计划同步下来
+                    /*op.insert("delete from Step where UserID=?", new String[]{sp.getID()});
+                    AVQuery<AVObject> query1 = new AVQuery<>("Step");
+                    query1.whereEqualTo("UserID", sp.getID());
+                    AVQuery<AVObject> query2 = new AVQuery<>("Step");
+                    query2.whereEqualTo("Date", TimeTools.getCurrentDate());
+                    AVQuery<AVObject> query = AVQuery.and(Arrays.asList(query1, query2));
+                    query.findInBackground(new FindCallback<AVObject>() {
+                        @Override
+                        public void done(List<AVObject> list, AVException e) {
+                            if (list.size() > 0) {
+                                for (int i = 0; i < list.size(); i++) {
+                                    op.insert("insert into Step(UserID,TotalSteps,Date) values(?,?,?)", new String[]{sp.getID(),
+                                            list.get(i).get("TotalSteps").toString(), list.get(i).get("Date").toString()});
+                                }
+
+                            }
+                        }
+                    });*/
                     break;
             }
         }

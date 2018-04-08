@@ -144,10 +144,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener,Tex
                             if(Build.VERSION.SDK_INT<Build.VERSION_CODES.O){
                                 sendBroadcast(new Intent("com.develop.sport.MYBROAD"));
                                 sendBroadcast(new Intent("com.develop.sport.MYBROAD2"));
+                                sendBroadcast(new Intent("com.develop.sport.MYBROAD3"));
                             }
                             else {
                                 sendBroadcast(new Intent("com.develop.sport.MYBROAD").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.MeSy$MyBroad")));
                                 sendBroadcast(new Intent("com.develop.sport.MYBROAD2").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.InteractSy$MyBroad")));
+                                sendBroadcast(new Intent("com.develop.sport.MYBROAD3").setComponent(new ComponentName("com.develop.sporthealth", "com.develop.sporthealth.HomeSy$MyBroad")));
+
                             }
                             finish();
                         }else {

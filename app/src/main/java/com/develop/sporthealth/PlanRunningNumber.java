@@ -1,6 +1,7 @@
 package com.develop.sporthealth;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -233,6 +234,8 @@ public class PlanRunningNumber extends AppCompatActivity implements View.OnClick
                 if(e==null){
                     Toast.makeText(context, "计划创建成功", Toast.LENGTH_SHORT).show();
                     AppManager.getAppManager().finishActivity(PlanRunning.class);
+                    Intent intent =new Intent(context,MeTime.class);
+                    startActivity(intent);
                     finish();
                 }else {
                     Toast.makeText(context, "计划创建失败，请稍后重试", Toast.LENGTH_SHORT).show();

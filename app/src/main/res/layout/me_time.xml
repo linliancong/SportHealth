@@ -28,7 +28,7 @@
             app:iconDrawablePress="@mipmap/back_select"
             app:spacing="10dp"
             app:style="iconLeft"
-            app:text="设置时间"
+            app:text="设置提醒时间"
             app:textSize="18"
             app:textColor="@color/black"
             />

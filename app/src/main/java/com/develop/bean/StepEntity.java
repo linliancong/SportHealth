@@ -11,6 +11,8 @@ public class StepEntity {
     private String curDate; //当天的日期
     private String steps;   //当天的步数
     private String userID;
+    private String userName;   //当天的步数
+    private String ImageURL;
 
     public StepEntity() {
     }
@@ -42,6 +44,22 @@ public class StepEntity {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    public void setImageURL(String imageURL) {
+        ImageURL = imageURL;
+    }
+
+    public String getImageURL() {
+        return ImageURL;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getUserName() {
+        return userName;
     }
 
     @Override

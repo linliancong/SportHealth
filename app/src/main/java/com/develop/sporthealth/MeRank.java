@@ -12,6 +12,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.CountCallback;
+import com.avos.avoscloud.FindCallback;
 import com.develop.tools.MyLayout;
 import com.develop.tools.SPTools;
 import com.develop.tools.database.SQLOperator;
@@ -99,7 +104,43 @@ public class MeRank extends AppCompatActivity {
 
     private void getRank() {
         //计算等级
-        data=op.select("select count(*) num from SportFinish where UserID=?", new String[]{sp.getID()});
+        //从服务器中获取数据
+        AVQuery<AVObject> query = new AVQuery<>("SportFinish");
+        query.whereEqualTo("UserID", sp.getID());
+        query.countInBackground(new CountCallback() {
+            @Override
+            public void done(int i, AVException e) {
+                if (e == null) {
+                    count=i;
+                    if(count<10){
+                        img_dj.setImageResource(R.mipmap.head1);
+                        txt_dj.setText("菜鸟");
+                        txt_rank.setText("新秀");
+                        txt_count.setText((10-count)+"");
+                    }else if(count<50){
+                        img_dj.setImageResource(R.mipmap.head2);
+                        txt_dj.setText("新秀");
+                        txt_rank.setText("达人");
+                        txt_count.setText((50-count)+"");
+                    }else if(count<100){
+                        img_dj.setImageResource(R.mipmap.head3);
+                        txt_dj.setText("达人");
+                        txt_rank.setText("健将");
+                        txt_count.setText((100-count)+"");
+                    }else if(count<200){
+                        img_dj.setImageResource(R.mipmap.head4);
+                        txt_dj.setText("健将");
+                        txt_rank.setText("王者");
+                        txt_count.setText((200-count)+"");
+                    }else if(count>=200){
+                        img_dj.setImageResource(R.mipmap.head5);
+                        txt_dj.setText("王者");
+                        visible.setVisibility(View.GONE);
+                    }
+                }
+            }
+        });
+        /*data=op.select("select count(*) num from SportFinish where UserID=?", new String[]{sp.getID()});
         if (data.size() != 0) {
             count=new Integer(data.get(0).get("num"));
             if(count<10){
@@ -128,7 +169,7 @@ public class MeRank extends AppCompatActivity {
                 visible.setVisibility(View.GONE);
             }
 
-        }
+        }*/
     }
 
     /**
